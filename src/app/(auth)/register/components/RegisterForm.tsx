@@ -25,7 +25,6 @@ import { strings } from '@/utils/strings';
 import { convertBtoMb } from '@/utils/convertBtoMb';
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '@/utils/constants';
 import Image from 'next/image';
-import { useGoogleLogin } from '@react-oauth/google';
 import { api } from '@/lib/api';
 import log from '@/utils/logger';
 import GoogleIcon from '@public/img/google-icon.png';
@@ -47,12 +46,6 @@ const inputSchema = z
         required_error: strings.validation.required,
       })
       .email(),
-    contact_number: z.string({
-      required_error: strings.validation.required,
-    }),
-    dob: z.string({
-      required_error: strings.validation.required,
-    }),
     password: z
       .string({
         required_error: strings.validation.required,
@@ -73,145 +66,14 @@ const inputSchema = z
       })
       .optional()
       .transform((v) => (typeof v === 'undefined' ? '' : v)),
-    user_role: z.enum(['mother', 'ob_gyne'], {
-      required_error: strings.validation.required,
-    }),
-    is_google_signin: z.boolean().default(false),
-    doctor_fee: z
-      .string({
-        required_error: strings.validation.required,
-        invalid_type_error: strings.validation.required,
-      })
-      .optional(),
-    gcash_number: z
-      .string({
-        required_error: strings.validation.required,
-        invalid_type_error: strings.validation.required,
-      })
-      .optional(),
-    gcash_qr_code: z
-      .any()
-      .refine((file: File | string) => {
-        if (typeof file === 'string') return true;
-        return file instanceof File && convertBtoMb(file.size) <= MAX_FILE_SIZE;
-      }, strings.validation.max_image_size)
-      .refine((file: File | string) => {
-        if (typeof file === 'string') return true;
-        return file && ACCEPTED_IMAGE_TYPES.includes(file?.type);
-      }, strings.validation.allowed_image_formats)
-      .optional()
-      .transform((v) => (typeof v === 'string' ? '' : v)),
+
   })
-  .refine(
-    ({ dob }) => {
-      log('[DOB]', moment().diff(dob, 'years'));
-      if (moment().diff(dob, 'years') < 16) {
-        return false;
-      }
-
-      return true;
-    },
-    {
-      path: ['dob'],
-      message: strings.validation.min_age,
-    }
-  )
-  .refine(
-    ({ password, is_google_signin }) => {
-      if (!is_google_signin && !password?.length) {
-        return false;
-      }
-      return true;
-    },
-    {
-      path: ['password'],
-      message: strings.validation.required,
-    }
-  )
-  .refine(
-    ({ password_confirmation, is_google_signin }) => {
-      if (!is_google_signin && !password_confirmation?.length) {
-        return false;
-      }
-      return true;
-    },
-    {
-      path: ['password_confirmation'],
-      message: strings.validation.required,
-    }
-  )
-  .refine(
-    ({ password, password_confirmation, is_google_signin }) => {
-      if (!is_google_signin && password != password_confirmation) {
-        return false;
-      }
-      return true;
-    },
-    {
-      path: ['password'],
-      message: strings.validation.password_confirmation,
-    }
-  )
-  .refine(
-    ({ password, password_confirmation, is_google_signin }) => {
-      if (!is_google_signin && password != password_confirmation) {
-        return false;
-      }
-      return true;
-    },
-    {
-      path: ['password_confirmation'],
-      message: strings.validation.password_confirmation,
-    }
-  )
-  .refine(
-    ({ user_role, gcash_number }) => {
-      if (user_role == 'ob_gyne' && !gcash_number) {
-        return false;
-      }
-
-      return true;
-    },
-    {
-      path: ['gcash_number'],
-      message: strings.validation.required,
-    }
-  )
-  .refine(
-    ({ user_role, gcash_qr_code }) => {
-      if (user_role == 'ob_gyne' && !gcash_qr_code) {
-        return false;
-      }
-
-      return true;
-    },
-    {
-      path: ['gcash_qr_code'],
-      message: strings.validation.required,
-    }
-  )
-  .refine(
-    ({ user_role, doctor_fee }) => {
-      if (user_role == 'ob_gyne' && !doctor_fee) {
-        return false;
-      }
-
-      return true;
-    },
-    {
-      path: ['doctor_fee'],
-      message: strings.validation.required,
-    }
-  );
 
 export type RegisterInputs = z.infer<typeof inputSchema>;
 
 const RegisterForm: FC = () => {
   const form = useForm<RegisterInputs>({
     resolver: zodResolver(inputSchema),
-    defaultValues: {
-      user_role: 'mother',
-    },
   });
   const [image, setImage] = useState('');
   const [isGoogleSignin, setIsGoogleSignin] = useState(false);

@@ -1,9 +1,6 @@
 import type { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import { LoginResponse, login, loginWithGoogle } from '@/lib/AuthenticationAPI';
-import { api } from './api';
-import axios from 'axios';
+import { login, LoginResponse } from '@/lib/AuthenticationAPI'; // Assuming you have a type named LoginResponse
 
 const AuthOptions: AuthOptions = {
   providers: [
@@ -21,25 +18,29 @@ const AuthOptions: AuthOptions = {
         if (!credentials?.email || !credentials.password) {
           throw new Error('Email and password are required');
         }
+
         const [response, error] = await login(credentials.email, credentials.password);
 
         if (error) {
           throw new Error(error);
         }
 
-        if (response?.data) {
-          return {
-            ...response.data.user,
-            token: response.data.token,
-          };
+        if (!response) {
+          return null;
         }
 
-        return null;
+        const { token, user } = response.data;
+
+        return {
+          token: token,
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+          role: user.role,
+          contact_number: user.contact_number || '',
+        };
       },
-    }),
-    GoogleProvider({
-      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
     }),
   ],
   session: {
@@ -52,31 +53,19 @@ const AuthOptions: AuthOptions = {
   callbacks: {
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.token = token.token;
-        session.user.name = `${token.first_name} ${token.last_name}`;
-        session.user.first_name = token.first_name;
-        session.user.last_name = token.last_name;
-        session.user.contact_number = token.contact_number;
+        session.user = {
+          ...session.user,
+          id: token.id,
+          role: token.role,
+          token: token.token,
+          name: `${token.first_name} ${token.last_name}`,
+          first_name: token.first_name,
+          last_name: token.last_name,
+        };
       }
       return session;
     },
     async jwt({ token, user, account }) {
-      if (account && account.provider === 'google' && account.access_token) {
-        const [response, error] = await loginWithGoogle('google', account.access_token);
-
-        if (error) {
-          throw new Error(error);
-        }
-
-        if (response?.data) {
-          user = {
-            ...response.data.user,
-            token: response.data.token,
-          };
-        }
-      }
 
       if (user) {
         token.id = user.id;

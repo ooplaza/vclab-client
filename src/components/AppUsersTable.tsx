@@ -23,7 +23,7 @@ export default function AppUsersTable() {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
 
-    const { data, isLoading } = useUsers(pageIndex + 1, pageSize, searchKeyword, sorting);
+    const { data, isLoading } = useUsers(pageIndex + 1, pageSize, searchKeyword);
 
     const [rowSelection, setRowSelection] = useState({});
     const columns: ColumnDef<User>[] = [

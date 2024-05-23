@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import createAppSlice from './createAppSlice';
 import createUserSlice from './createUserSlice';
-import createScheduleAppointmentSlice from './createScheduleAppointmentSlice';
 import { CombinedState } from '@/types/store';
 import { immer } from 'zustand/middleware/immer';
 import deepMerge from 'deepmerge';
@@ -13,7 +12,6 @@ const useStore = create<CombinedState>()(
       immer((...api) => ({
         app: createAppSlice(...api),
         user: createUserSlice(...api),
-        schedule_appointments: createScheduleAppointmentSlice(...api),
       })),
       {
         name: 'nurturemoms-state',

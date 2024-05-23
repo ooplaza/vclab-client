@@ -4,19 +4,13 @@ import React, { FC } from 'react';
 
 const Layout: FC<{
   admin: React.ReactNode;
-  mother: React.ReactNode;
-  ob: React.ReactNode;
-}> = async ({ admin, mother, ob }) => {
+}> = async ({ admin, }) => {
   const session = await getServerSession(AuthOptions);
 
   const renderContent = () => {
     switch (session?.user.role) {
       case 'admin':
         return admin;
-      case 'mother':
-        return mother;
-      case 'ob_gyne':
-        return ob;
       default:
         return null;
     }

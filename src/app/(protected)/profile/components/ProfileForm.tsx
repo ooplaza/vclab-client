@@ -148,14 +148,8 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
       id: user.id,
       params: inputs,
     });
-  };
-
-  useEffect(() => {
-    if (user.image) {
-      setImage(user.image);
-    }
-  }, [user]);
-
+  }; 
+  
   return (
     <>
       <Card className='mt-5 p-10'>

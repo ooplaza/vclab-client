@@ -10,7 +10,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '',
+        hostname: 'https://vc-lab-client.vercel.app',
         port: '',
         pathname: '/**',
       },

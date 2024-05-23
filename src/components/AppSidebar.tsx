@@ -2,7 +2,6 @@
 import React from 'react';
 import AppRoutes from './AppRoutes';
 import User from '@/types/User';
-import AppDoctorToggleAccount from './AppDoctorToggleAccount';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { useSession } from 'next-auth/react';

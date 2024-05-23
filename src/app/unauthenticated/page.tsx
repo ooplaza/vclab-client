@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
-export const page: FC = async () => {
+const page: React.FC = () => {
   return (
     <main className='flex h-screen w-screen items-center justify-center bg-white text-center'>
       <div>
