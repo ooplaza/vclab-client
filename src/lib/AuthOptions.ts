@@ -18,10 +18,10 @@ const AuthOptions: AuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const [response, error] = await login(
-          credentials?.email!,
-          credentials?.password!
-        );
+        if (!credentials?.email || !credentials.password) {
+          throw new Error('Email and password are required');
+        }
+        const [response, error] = await login(credentials.email, credentials.password);
 
         if (error) {
           throw new Error(error);
@@ -55,7 +55,7 @@ const AuthOptions: AuthOptions = {
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.token = token.token;
-        session.user.name = token.first_name + ' ' + token.last_name;
+        session.user.name = `${token.first_name} ${token.last_name}`;
         session.user.first_name = token.first_name;
         session.user.last_name = token.last_name;
         session.user.contact_number = token.contact_number;
@@ -63,11 +63,8 @@ const AuthOptions: AuthOptions = {
       return session;
     },
     async jwt({ token, user, account }) {
-      if (account && account.provider == 'google' && account.access_token) {
-        const [response, error] = await loginWithGoogle(
-          'google',
-          account.access_token
-        );
+      if (account && account.provider === 'google' && account.access_token) {
+        const [response, error] = await loginWithGoogle('google', account.access_token);
 
         if (error) {
           throw new Error(error);
@@ -87,7 +84,6 @@ const AuthOptions: AuthOptions = {
         token.token = user.token;
         token.first_name = user.first_name;
         token.last_name = user.last_name;
-        token.contact_number = user.contact_number;
       }
       return token;
     },
