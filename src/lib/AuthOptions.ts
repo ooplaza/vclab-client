@@ -1,6 +1,7 @@
 import type { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { login, LoginResponse } from '@/lib/AuthenticationAPI'; // Assuming you have a type named LoginResponse
+import { LoginResponse, login } from '@/lib/AuthenticationAPI';
+import User from '@/types/User';
 
 const AuthOptions: AuthOptions = {
   providers: [
@@ -14,33 +15,25 @@ const AuthOptions: AuthOptions = {
         },
         password: { label: 'Password', type: 'password' },
       },
-      authorize: async (credentials) => {
-        if (!credentials?.email || !credentials.password) {
+      authorize: async (credentials, req) => {
+        if (!credentials || !credentials.email || !credentials.password) {
           throw new Error('Email and password are required');
         }
-
         const [response, error] = await login(credentials.email, credentials.password);
 
         if (error) {
           throw new Error(error);
         }
 
-        if (!response) {
-          return null;
+        if (response?.data) {
+          return {
+            ...response.data.user,
+            token: response.data.token,
+          } as User | null;
         }
 
-        const { token, user } = response.data;
-
-        return {
-          token: token,
-          id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          role: user.role,
-          contact_number: user.contact_number || '',
-        };
-      },
+        return null;
+      }, 
     }),
   ],
   session: {
@@ -65,8 +58,7 @@ const AuthOptions: AuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user, account }) {
-
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;

@@ -6,6 +6,7 @@ export default interface User {
   email: string;
   role: string;
   contact_number?: string;
+  token?: string;
 }
 
 export interface UserPaginatedData {
