@@ -1,3 +1,4 @@
+'use-client'
 import { api } from './api';
 import User from '@/types/User';
 import apiError from '@/lib/apiError';
