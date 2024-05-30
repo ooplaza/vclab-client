@@ -1,7 +1,8 @@
+"use client"
 import React from "react";
 import Image from "next/image";
 import SectionTitle from "@/components/SectionTitle";
-import LOGO from "/public/images/contact.png";
+import LOGO from "/public/img/contact.png";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';

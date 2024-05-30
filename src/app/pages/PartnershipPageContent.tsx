@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import LOGO from "/public/images/partnership.png";
+import LOGO from "/public/img/partnership.png";
 import CustomButtonTarget from "@/components/CustomButtonTarget";
 import { Microscope } from "lucide-react"
 import SectionTitle from "@/components/SectionTitle";

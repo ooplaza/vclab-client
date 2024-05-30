@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import CustomButtonTarget from "@/components/CustomButtonTarget";
 import SectionTitle from "@/components/SectionTitle";
