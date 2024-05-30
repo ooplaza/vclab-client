@@ -53,6 +53,13 @@ const inputSchema = z
       .min(1, {
         message: strings.validation.required,
       }),
+    username: z
+      .string({
+        required_error: strings.validation.required,
+      })
+      .min(1, {
+        message: strings.validation.required,
+      }),
     current_password: z
       .string()
       .nullish()
@@ -102,6 +109,8 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
       ...user,
     },
   });
+
+  console.log("User ", user)
 
   const [open, setOpen] = useState(false);
 
@@ -163,23 +172,42 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     )}
                   />
                 </div>
-                <FormField
-                  control={form.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='email'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className='grid gap-x-10 sm:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='username'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='text'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='email'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name='current_password'
@@ -216,7 +244,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                 />
               </div>
               <div className='mt-16 text-right'>
-                <Button type="submit" className='w-full px-20 sm:w-auto'>
+                <Button type="submit" className='w-full px-20 sm:w-auto text-white'>
                   Save
                 </Button>
               </div>

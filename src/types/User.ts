@@ -5,9 +5,12 @@ export default interface User {
   first_name: string;
   last_name: string;
   email: string;
+  username?: string;
   role?: string;
   contact_number?: string;
   token?: string;
+  is_active?: boolean,
+  is_superuser?: boolean,
 }
 
 export interface UserPaginatedData {

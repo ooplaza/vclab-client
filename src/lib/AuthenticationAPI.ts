@@ -47,17 +47,12 @@ export const loginWithGoogle = async (
 
 export const register = async (
   inputs: RegisterInputs,
-  isGoogleSignin: boolean = false
 ): Promise<Response> => {
   const fd = new FormData();
   for (const item in inputs) {
     fd.append(item, inputs[item as keyof RegisterInputs]);
   }
-
-  // if (isGoogleSignin) {
-  //   fd.append('provider', 'google');
-  // }
-  const { data } = await api.post<Response>('/api/register', fd, {
+  const { data } = await api.post<Response>('/api/auth/register', fd, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -71,14 +66,12 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async ({
       inputs,
-      isGoogleSignin = false,
     }: {
       inputs: RegisterInputs;
-      isGoogleSignin: boolean;
     }): Promise<Response> => {
-      return await register(inputs, isGoogleSignin);
+      return await register(inputs);
     },
-    onSuccess: async (data: Response, { inputs, isGoogleSignin }) => {
+    onSuccess: async (data: Response, { inputs }) => {
       toast({
         description: data.message,
         variant: 'success',
@@ -86,10 +79,6 @@ export const useRegister = () => {
       });
 
       setTimeout(async () => {
-        if (isGoogleSignin) {
-          router.push('/login');
-          return;
-        }
 
         const response = await signIn('credentials', {
           ...inputs,
