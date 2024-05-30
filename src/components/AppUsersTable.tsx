@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ColumnDef,
     PaginationState,
@@ -10,20 +10,71 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Eye, Trash } from 'lucide-react';
+import { ArrowUpDown, Edit, Trash } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { useUsers } from '@/lib/UsersAPI';
+import { useUserList, useDeleteUser } from '@/lib/UsersAPI';
 import User from '@/types/User';
+import AppUserForm from './AppUserForm';
+import AppConfirmationDialog from './AppConfirmationDialog';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AppUsersTable() {
+    const queryClient = useQueryClient();
+    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+    const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,
     });
     const [searchKeyword, setSearchKeyword] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-    const { data, isLoading } = useUsers(pageIndex + 1, pageSize, searchKeyword);
+    const { data, isLoading } = useUserList({
+        offset: pageIndex
+    });
+
+    const { mutate } = useDeleteUser();
+
+    useEffect(() => {
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        setSearchTimeout(
+            setTimeout(() => {
+                setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
+            }, 1000)
+        );
+
+        return () => {
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+        };
+    }, [searchKeyword]);
+
+    const handleDelete = (id: string) => {
+        mutate(id.toString(), {
+            onSettled: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['repositories']
+                });
+            }
+        });
+    };
+
+    const handleEdit = (user: User) => {
+        setSelectedUser(user);
+        setIsEditUserDialogOpen(true);
+    };
+
+    const handleCloseEditDialog = () => {
+        setIsEditUserDialogOpen(false);
+        setSelectedUser(null);
+    };
 
     const [rowSelection, setRowSelection] = useState({});
     const columns: ColumnDef<User>[] = [
@@ -74,12 +125,19 @@ export default function AppUsersTable() {
                 const item = row.original;
                 return (
                     <div className="flex justify-center space-x-4">
-                        <Button variant="secondary" type='button' onClick={() => console.log('View clicked')}>
-                            <Eye size={20} />
+                        <Button variant="secondary" type='button' onClick={() => handleEdit(item)}>
+                            <Edit size={20} />
                         </Button>
-                        <Button variant="destructive" type='button' onClick={() => console.log('Delete clicked')}>
-                            <Trash size={20} />
-                        </Button>
+                        <AppConfirmationDialog
+                            title='Delete User'
+                            description={`Are you sure you want to delete the user "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
+                            buttonElem={
+                                <Button className="text-white" variant="destructive" type='button'>
+                                    <Trash size={20} />
+                                </Button>
+                            }
+                            handleDialogAction={() => handleDelete(item.id!)}
+                        />
                     </div>
                 );
             },
@@ -120,5 +178,43 @@ export default function AppUsersTable() {
         },
     });
 
-    return <AppTable table={table} />;
+    return (
+        <div>
+            <div className="flex justify-between mt-5">
+                <div>
+                    <input
+                        type="text"
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        placeholder="Search..."
+                        className="border border-gray-300 px-3 py-2 rounded-md mr-4"
+                    />
+                </div>
+                <div>
+                    <Button variant="default" className="text-white" onClick={() => { setIsAddUserDialogOpen(true) }}>Add User</Button>
+                    {
+                        isAddUserDialogOpen && (
+                            <AppUserForm
+                                onClose={() => setIsAddUserDialogOpen(false)}
+                                isOpen={isAddUserDialogOpen}
+                                queryClient={queryClient}
+                            />
+                        )
+                    }
+
+                    {
+                        isEditUserDialogOpen && selectedUser && (
+                            <AppUserForm
+                                onClose={handleCloseEditDialog}
+                                isOpen={isEditUserDialogOpen}
+                                queryClient={queryClient}
+                                data={selectedUser}
+                            />
+                        )
+                    }
+                </div>
+            </div>
+            <AppTable table={table} />
+        </div>
+    );
 }

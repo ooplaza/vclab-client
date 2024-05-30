@@ -3,4 +3,5 @@ export default interface Response {
   message?: string;
   payload?: unknown;
   data?: Record<string, unknown>;
+  status: boolean;
 }

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ColumnDef,
   PaginationState,
@@ -11,26 +11,69 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
 import { Edit, Trash } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Repository } from '@/types/Repository';
-import { useGetRepositoriesList } from '@/lib/RepositoriesAPI';
+import { useDeleteRepository, useGetRepositoriesList } from '@/lib/RepositoriesAPI';
+import AppRepositoryForm from './AppRepositoryForm';
+import AppConfirmationDialog from './AppConfirmationDialog';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AppRepositoriesTable() {
+  const queryClient = useQueryClient();
+  const [isAddRepositoryDialogOpen, setIsAddRepositoryDialogOpen] = useState(false);
+  const [isEditRepositoryDialogOpen, setIsEditRepositoryDialogOpen] = useState(false);
+  const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
+
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [searchKeyword, setSearchKeyword] = React.useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const { data, isLoading } = useGetRepositoriesList({
-    page: pageIndex + 1,
-    pageSize: pageSize,
-    search: searchKeyword,
-    sortColumn: sorting.map((item) => item.id).join(','),
-    sortDesc: Boolean(sorting.map((item) => item.desc).join(',')),
+    offset: pageIndex
   });
 
+  const { mutate } = useDeleteRepository();
+
+  useEffect(() => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    setSearchTimeout(
+      setTimeout(() => {
+        setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
+      }, 1000)
+    );
+
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchKeyword]);
+
+  const handleDelete = (id: string) => {
+    mutate(id.toString(), {
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['repositories']
+        });
+      }
+    });
+  };
+
+  const handleEdit = (repository: Repository) => {
+    setSelectedRepository(repository);
+    setIsEditRepositoryDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditRepositoryDialogOpen(false);
+    setSelectedRepository(null);
+  };
 
   const [rowSelection, setRowSelection] = useState({});
   const columns: ColumnDef<Repository>[] = [
@@ -62,12 +105,18 @@ export default function AppRepositoriesTable() {
       ),
       cell: ({ row }) => {
         const item = row.original;
-        const categoryName = item.category ? item.category.name : 'Unknown';
+        let categoryName: string;
+
+        if (typeof item.category === 'string') {
+          categoryName = item.category;
+        } else {
+          categoryName = item.category?.name || 'Unknown';
+        }
+
         return <div>{categoryName}</div>;
       },
       enableSorting: true,
     },
-
     {
       accessorKey: 'author',
       header: () => (
@@ -96,7 +145,18 @@ export default function AppRepositoriesTable() {
       ),
       cell: ({ row }) => {
         const item = row.original;
-        return <div>{item.description}</div>;
+        const [isExpanded, setIsExpanded] = useState(false);
+        const description = isExpanded ? item.description : item.description.slice(0, 50) + (item.description.length > 50 ? '...' : '');
+        return (
+          <div>
+            {description}
+            {item.description.length > 50 && (
+              <Button variant="link" className="pl-2" onClick={() => setIsExpanded(!isExpanded)}>
+                {isExpanded ? 'See Less' : 'See More'}
+              </Button>
+            )}
+          </div>
+        );
       },
       enableSorting: true,
     },
@@ -113,7 +173,7 @@ export default function AppRepositoriesTable() {
       cell: ({ row }) => {
         const item = row.original;
         return (
-          <a href={item.link} target="_blank" rel="noopener noreferrer">
+          <a href={item.link} className="text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
             {item.link}
           </a>
         );
@@ -127,21 +187,26 @@ export default function AppRepositoriesTable() {
         const item = row.original;
         return (
           <div className="flex justify-center space-x-4">
-            <Button variant="secondary" type='button' onClick={() => console.log('Edit clicked')}>
+            <Button variant="secondary" type='button' onClick={() => handleEdit(item)}>
               <Edit size={20} />
             </Button>
-            <Button variant="destructive" type='button' onClick={() => console.log('Delete clicked')}>
-              <Trash size={20} />
-            </Button>
+            <AppConfirmationDialog
+              title='Delete Repository'
+              description={`Are you sure you want to delete the repository "${item.title}"? This action cannot be undone.`}
+              buttonElem={
+                <Button className="text-white" variant="destructive" type='button'>
+                  <Trash size={20} />
+                </Button>
+              }
+              handleDialogAction={() => handleDelete(item.id!)}
+            />
           </div>
         );
       },
       enableSorting: false,
       enableHiding: false,
     },
-
   ];
-
 
   const pagination = React.useMemo(
     () => ({
@@ -164,7 +229,7 @@ export default function AppRepositoriesTable() {
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     onGlobalFilterChange: setSearchKeyword,
-    pageCount: data?.last_page ?? -1,
+    pageCount: data?.count ?? -1,
     manualPagination: true,
     manualFiltering: true,
     manualSorting: true,
@@ -176,5 +241,43 @@ export default function AppRepositoriesTable() {
     },
   });
 
-  return <AppTable table={table} />;
+  return (
+    <div>
+      <div className="flex justify-between mt-5">
+        <div>
+          <input
+            type="text"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            placeholder="Search..."
+            className="border border-gray-300 px-3 py-2 rounded-md mr-4"
+          />
+        </div>
+        <div>
+          <Button variant="default" className="text-white" onClick={() => { setIsAddRepositoryDialogOpen(true) }}>Add Repository</Button>
+          {
+            isAddRepositoryDialogOpen && (
+              <AppRepositoryForm
+                onClose={() => setIsAddRepositoryDialogOpen(false)}
+                isOpen={isAddRepositoryDialogOpen}
+                queryClient={queryClient}
+              />
+            )
+          }
+
+          {
+            isEditRepositoryDialogOpen && selectedRepository && (
+              <AppRepositoryForm
+                onClose={handleCloseEditDialog}
+                isOpen={isEditRepositoryDialogOpen}
+                queryClient={queryClient}
+                data={selectedRepository}
+              />
+            )
+          }
+        </div>
+      </div>
+      <AppTable table={table} />
+    </div>
+  );
 }

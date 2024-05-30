@@ -1,96 +1,84 @@
-import { ProfileFormInputs } from '@/app/(protected)/profile/components/ProfileForm';
-import { toast } from '@/components/ui/use-toast';
-import { api } from '@/lib/api';
+import { api } from './api';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import Pagination from '@/types/Pagination';
+import { UserPaginatedData } from '@/types/User';
+import { UserInput } from '@/components/AppUserForm';
 import Response from '@/types/Response';
-import User, { UserPaginatedData } from '@/types/User';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useLogout } from './AuthenticationAPI';
+import { toast } from '@/components/ui/use-toast';
 
-export const getUsers = async (
-  page: number = 1,
-  pageSize: number = 10,
-  filter = '',
-  sortColumn = '',
-  sortDesc = false
-): Promise<User[]> => {
+export const getUserList = async (params: Pagination): Promise<UserPaginatedData> => {
   const { data } = await api.get<UserPaginatedData>(`/api/auth/users`, {
-    params: {
-      page,
-      ...(pageSize && { page_size: pageSize }),
-      ...(filter && { filter }),
-      ...(sortColumn && { sort_column: sortColumn }),
-      sort_desc: sortDesc,
-    },
+    params: params,
   });
-
-  return data.results;
+  return data;
 };
 
+export const createUser = async (inputs: UserInput): Promise<Response> => {
+  const { data } = await api.post<Response>(`/api/auth/users`, inputs);
+  return data;
+};
 
-
-export const updateUser = async (
-  id: string,
-  params: ProfileFormInputs
-): Promise<Response> => {
-  const fd = new FormData();
-  fd.append('_method', 'put');
-  for (const item in params) {
-    fd.append(item, params[item as keyof ProfileFormInputs]);
-  }
-  const { data } = await api.post<Response>(`/api/users/${id}`, fd, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+export const updateUser = async (id: string, inputs: UserInput): Promise<Response> => {
+  const { data } = await api.patch<Response>(`/api/auth/users/${id}`, inputs);
   return data;
 };
 
 export const deleteUser = async (id: string): Promise<Response> => {
-  const { data } = await api.delete<Response>(`/api/users/${id}`);
-  return data;
+  const response = await api.delete(`/api/auth/users/${id}`);
+  return response.data;
 };
 
-/* HOOKS */
-
-export const useUsers = (
-  page: number = 1,
-  pageSize: number = 10,
-  globalFilter = '',
-  sortColumn = '',
-  sortDesc = false
-) =>
+export const useUserList = (params: Pagination) =>
   useQuery({
-    queryKey: ['users', page, pageSize, globalFilter, sortColumn, sortDesc],
+    queryKey: ['users', params],
     queryFn: async (): Promise<UserPaginatedData> => {
-      const users = await getUsers(page, pageSize, globalFilter, sortColumn, sortDesc);
-      return { results: users, last_page: 1 };
+      return await getUserList(params);
     },
   });
 
+export const useCreateUser = () => {
+  return useMutation({
+    mutationFn: async (inputs: UserInput) => {
+      return await createUser(inputs);
+    },
+    onSuccess: (response) => {
+      if (response.status === true)
+        toast({
+          variant: 'success',
+          description: response.message,
+        });
+    },
+  });
+};
 
 export const useUpdateUser = () => {
-  const { mutate: logout } = useLogout();
-
   return useMutation({
-    mutationFn: async ({
-      id,
-      params,
-    }: {
-      id: string;
-      params: ProfileFormInputs;
-    }) => {
-      return await updateUser(id, params);
+    mutationFn: async ({ id, userData }: { id: string; userData: UserInput }) => {
+      return await updateUser(id, userData);
     },
-    onSuccess: async (response) => {
-      logout();
-
-      // SHOW MESSAGE
-      toast({
-        variant: 'success',
-        description: response.message,
-      });
+    onSuccess: (response) => {
+      if (response && response.status === true) {
+        toast({
+          variant: 'success',
+          description: response.message,
+        });
+      }
     },
   });
 };
 
-/* END HOOKS */
+export const useDeleteUser = () => {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteUser(id);
+    },
+    onSuccess: (response) => {
+      if (response && response.status === true) {
+        toast({
+          variant: 'success',
+          description: response.message,
+        });
+      }
+    },
+  });
+};

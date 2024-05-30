@@ -29,7 +29,7 @@ const AuthOptions: AuthOptions = {
           return {
             ...response.data.user,
             token: response.data.token,
-          } as User | null;
+          } as any;
         }
 
         return null;

@@ -1,11 +1,10 @@
 export interface Repository {
-  id: string;
+  id?: string;
   title: string;
   author: string;
-  is_public: string;
+  is_public?: string | boolean;
   description: string;
-  user_id: string;
-  category: Category;
+  category: Category | string;
   link: string;
 }
 
@@ -13,7 +12,9 @@ export interface Category {
   name: string;
 }
 
+
 export interface RepositoryPaginatedData {
   results: Repository[];
+  count: number;
   last_page: number;
 }

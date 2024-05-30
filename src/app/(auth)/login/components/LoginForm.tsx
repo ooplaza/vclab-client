@@ -20,9 +20,6 @@ import AppSpinner from '@/components/AppSpinner';
 import { toast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { strings } from '@/utils/strings';
-import GoogleIcon from '@public/img/google-icon.png';
-import Image from 'next/image';
-import axios from 'axios';
 
 const inputSchema = z.object({
   email: z

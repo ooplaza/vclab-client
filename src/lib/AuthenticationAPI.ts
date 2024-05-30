@@ -110,7 +110,7 @@ export const useRegister = () => {
 };
 
 export const logout = async () => {
-  await api.post('/api/logout');
+  await api.post('/api/auth/logout');
 };
 
 export const useLogout = () => {

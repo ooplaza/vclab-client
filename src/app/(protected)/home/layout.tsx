@@ -10,7 +10,7 @@ const Layout: FC<{
   const renderContent = () => {
     switch (session?.user.role) {
       case 'admin':
-        return admin; 
+        return admin;
       default:
         return null;
     }

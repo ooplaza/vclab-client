@@ -1,10 +1,11 @@
 // MAIN
 export default interface User {
-  id: string;
+  id?: string;
+  name?: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: string;
+  role?: string;
   contact_number?: string;
   token?: string;
 }

@@ -3,9 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 const page = async () => {
-  /* const { data } = await api.get<{
-    repositories_count: number; 
-  }>('/api/admin/dashboard'); */
+  const { data } = await api.get('/api/auth/repositories');
 
   return (
     <div className='flex space-x-5'>
@@ -14,7 +12,7 @@ const page = async () => {
           <CardContent className='flex h-full items-center justify-center p-6 text-center'>
             <div className='space-y-5'>
               <h4 className='text-[2rem] font-semibold'>Number of Repositories</h4>
-              <p className='text-5xl font-bold'>1</p>
+              <p className='text-5xl font-bold'>{data.count}</p>
             </div>
           </CardContent>
         </Card>
