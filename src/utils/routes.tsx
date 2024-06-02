@@ -1,19 +1,8 @@
 import React from 'react';
 import {
   Home,
-  Inbox,
   User,
-  Album,
-  CalendarDays,
-  File,
-  ShoppingCart,
-  Youtube,
-  BadgeCheck,
-  UserSquare,
-  BookUser,
-  BookCheck,
   Users,
-  Wallet,
   FolderKanban
 } from 'lucide-react';
 
@@ -57,24 +46,7 @@ const routes: Route[] = [
     icon: <User />,
     roles: ['admin', 'user',],
     isSidebarVisible: true,
-    child_routes: [
-      {
-        route: '/verification',
-        title: 'Verification',
-        icon: <BadgeCheck />,
-        roles: ['ob_gyne'],
-        isSidebarVisible: true,
-        child_routes: [],
-      },
-      {
-        route: '/display-information',
-        title: 'Display Information',
-        icon: <UserSquare />,
-        roles: ['ob_gyne'],
-        isSidebarVisible: true,
-        child_routes: [],
-      },
-    ],
+    child_routes: [],
   },
 ];
 

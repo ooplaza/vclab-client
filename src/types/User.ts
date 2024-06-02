@@ -8,9 +8,13 @@ export default interface User {
   username?: string;
   role?: string;
   contact_number?: string;
+  dob?: string;
   token?: string;
   is_active?: boolean,
   is_superuser?: boolean,
+  password?: string
+  new_password?: string
+  confirm_password?: string
 }
 
 export interface UserPaginatedData {
@@ -26,4 +30,11 @@ export interface UserStateDefinition {
 // ACTIONS
 export interface UserStateActions {
   setUser: (user: User) => void;
+}
+
+
+export interface UserResponse {
+  message: string;
+  status: boolean;
+  data: User;
 }

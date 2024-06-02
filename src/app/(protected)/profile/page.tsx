@@ -1,12 +1,12 @@
 import React from 'react';
-import User from '@/types/User';
+import { UserResponse } from '@/types/User';
 import { api } from '@/lib/api';
 import ProfileForm from './components/ProfileForm';
 
 const page = async () => {
   try {
-    const response = await api.get<User>(`/api/auth/profile`);
-    const userData = response.data;
+    const response = await api.get<UserResponse>(`/api/auth/profile`);
+    const userData = response.data.data;
 
     return (
       <>

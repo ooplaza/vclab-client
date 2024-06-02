@@ -37,7 +37,7 @@ const data = [
   },
 ];
 
-export default function ServicesPageContent() {
+export default function service() {
   return (
     <>
       <SectionTitle

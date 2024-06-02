@@ -1,127 +1,83 @@
 'use client';
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { strings } from '@/utils/strings';
 import { useUpdateUser } from '@/lib/UsersAPI';
 import User from '@/types/User';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AlertDialogDescription } from '@radix-ui/react-alert-dialog';
 import AppSpinner from '@/components/AppSpinner';
 
-const inputSchema = z
-  .object({
-    first_name: z
-      .string({
-        required_error: strings.validation.required,
-      })
-      .min(1, {
-        message: strings.validation.required,
-      }),
-    last_name: z
-      .string({
-        required_error: strings.validation.required,
-      })
-      .min(1, {
-        message: strings.validation.required,
-      }),
-    email: z
-      .string({
-        required_error: strings.validation.required,
-      })
-      .email()
-      .min(1, {
-        message: strings.validation.required,
-      }),
-    username: z
-      .string({
-        required_error: strings.validation.required,
-      })
-      .min(1, {
-        message: strings.validation.required,
-      }),
-    current_password: z
-      .string()
-      .nullish()
-      .transform((v) => v ?? ''),
-    new_password: z
-      .string()
-      .nullish()
-      .transform((v) => v ?? ''),
-  })
-  .refine(
-    (data) =>
-      data.current_password.length <= 0 && data.new_password.length > 0
-        ? false
-        : true,
-    {
-      message: 'Please fill out the current password field',
-      path: ['current_password'],
-    }
-  )
-  .refine(
-    (data) => {
-      console.log(
-        'data.current_password: ',
-        data.current_password.length > 0,
-        'data.new_password: ',
-        data.new_password.length <= 0,
-        data.current_password.length > 0 && data.new_password.length <= 0
-          ? false
-          : true
-      );
-      return data.current_password.length > 0 && data.new_password.length <= 0
-        ? false
-        : true;
-    },
-    {
-      message: 'Please fill out the new password field',
-      path: ['new_password'],
-    }
-  );
+const inputSchema = z.object({
+  first_name: z.string({ required_error: strings.validation.required }).min(1, { message: strings.validation.required }),
+  last_name: z.string({ required_error: strings.validation.required }).min(1, { message: strings.validation.required }),
+  email: z.string({ required_error: strings.validation.required }).email().min(1, { message: strings.validation.required }),
+  confirm_password: z.string().nullish().transform((v) => v ?? ''),
+  new_password: z.string().nullish().transform((v) => v ?? ''),
+}).refine(data => data.confirm_password.length <= 0 && data.new_password.length > 0 ? false : true, {
+  message: 'Please fill out the confirm password field',
+  path: ['confirm_password'],
+}).refine(data => data.confirm_password.length > 0 && data.new_password.length <= 0 ? false : true, {
+  message: 'Please fill out the new password field',
+  path: ['new_password'],
+});
+
 export type ProfileFormInputs = z.infer<typeof inputSchema>;
 
 const ProfileForm: FC<{ user: User }> = ({ user }) => {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const form = useForm<ProfileFormInputs>({
     reValidateMode: 'onChange',
     resolver: zodResolver(inputSchema),
     defaultValues: {
-      ...user,
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      email: user.email || '',
+      confirm_password: '',
+      new_password: '',
     },
   });
 
   console.log("User ", user)
 
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    form.reset({
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      email: user.email || '',
+      confirm_password: '',
+      new_password: '',
+    });
+  }, [user, form]);
 
-  const { mutate, status } = useUpdateUser();
+  const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
   const onSubmit = (inputs: ProfileFormInputs) => {
     if (user.id) {
-      mutate({
-        id: user.id,
-        userData: inputs,
-      });
+      updateUser(
+        { id: user.id, userData: inputs },
+        {
+          onSuccess: (response) => {
+            console.log('response', response);
+            form.setValue('new_password', '');
+            form.setValue('confirm_password', '');
+          },
+          onSettled: () => {
+            setOpen(false);
+          },
+        }
+      );
     }
   };
 
@@ -129,124 +85,59 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
     <>
       <Card className='mt-5 p-10'>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(() => {
-              setOpen(true);
-            })}
-          >
+          <form onSubmit={form.handleSubmit(() => { setOpen(true); })}>
             <CardContent className='py-10'>
               <div className='grid gap-x-10 gap-y-5 sm:grid-cols-2'>
                 <div className='grid gap-x-10 sm:grid-cols-2'>
-                  <FormField
-                    control={form.control}
-                    name='first_name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='text'
-                            {...field}
-                            className='border-primary focus-visible:ring-offset-0'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='last_name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='text'
-                            {...field}
-                            className='border-primary focus-visible:ring-offset-0'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className='grid gap-x-10 sm:grid-cols-2'>
-                  <FormField
-                    control={form.control}
-                    name='username'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='text'
-                            {...field}
-                            className='border-primary focus-visible:ring-offset-0'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='email'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='email'
-                            {...field}
-                            className='border-primary focus-visible:ring-offset-0'
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name='current_password'
-                  render={({ field }) => (
+                  <FormField control={form.control} name='first_name' render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Current Password</FormLabel>
+                      <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input
-                          type='password'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
+                        <Input type='text' {...field} className='border-primary focus-visible:ring-offset-0' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='new_password'
-                  render={({ field }) => (
+                  )} />
+                  <FormField control={form.control} name='last_name' render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input
-                          type='password'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
+                        <Input type='text' {...field} className='border-primary focus-visible:ring-offset-0' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
+                  )} />
+                </div>
+                <FormField control={form.control} name='email' render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type='email' {...field} className='border-primary focus-visible:ring-offset-0' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name='new_password' render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input type='password' {...field} className='border-primary focus-visible:ring-offset-0' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name='confirm_password' render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type='password' {...field} className='border-primary focus-visible:ring-offset-0' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
               </div>
               <div className='mt-16 text-right'>
-                <Button type="submit" className='w-full px-20 sm:w-auto text-white'>
-                  Save
-                </Button>
+                <Button type="submit" className='w-full px-20 sm:w-auto text-white'>Save</Button>
               </div>
             </CardContent>
           </form>
@@ -255,18 +146,13 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to update your profile?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              You will be logged out after this action
-            </AlertDialogDescription>
+            <AlertDialogTitle>Are you sure you want to update your profile?</AlertDialogTitle>
+            <AlertDialogDescription>You will be logged out after this action</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>No</AlertDialogCancel>
-            <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>
-              {/* {isLoading ? <AppSpinner className='mx-auto' /> : 'Continue'} */}
-              Continue
+            <AlertDialogCancel disabled={loading}>No</AlertDialogCancel>
+            <AlertDialogAction className="text-white" onClick={() => form.handleSubmit(onSubmit)()}>
+              {loading ? <AppSpinner /> : 'Continue'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

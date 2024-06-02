@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ColumnDef,
   PaginationState,
@@ -7,6 +7,12 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
@@ -16,6 +22,7 @@ import { useDeleteRepository, useGetRepositoriesList } from '@/lib/RepositoriesA
 import AppRepositoryForm from './AppRepositoryForm';
 import AppConfirmationDialog from './AppConfirmationDialog';
 import { useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash.debounce';
 
 export default function AppRepositoriesTable() {
   const queryClient = useQueryClient();
@@ -29,7 +36,7 @@ export default function AppRepositoriesTable() {
   });
   const [searchKeyword, setSearchKeyword] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   const { data, isLoading } = useGetRepositoriesList({
     offset: pageIndex
@@ -37,23 +44,17 @@ export default function AppRepositoriesTable() {
 
   const { mutate } = useDeleteRepository();
 
+  const debouncedSearch = useMemo(() =>
+    debounce((keyword) => {
+      setIsSearching(false);
+      setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
+    }, 1000), []
+  );
+
   useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-
-    setSearchTimeout(
-      setTimeout(() => {
-        setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
-      }, 1000)
-    );
-
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-    };
-  }, [searchKeyword]);
+    setIsSearching(true);
+    debouncedSearch(searchKeyword);
+  }, [searchKeyword, debouncedSearch]);
 
   const handleDelete = (id: string) => {
     mutate(id.toString(), {
@@ -172,10 +173,25 @@ export default function AppRepositoriesTable() {
       ),
       cell: ({ row }) => {
         const item = row.original;
+
         return (
-          <a href={item.link} className="text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
-            {item.link}
-          </a>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <a
+                  href={item.link}
+                  className="text-blue-600 hover:text-blue-700"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Click Here
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{item.link}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         );
       },
       enableSorting: true,
@@ -208,7 +224,20 @@ export default function AppRepositoriesTable() {
     },
   ];
 
-  const pagination = React.useMemo(
+  const filteredData = useMemo(() => {
+    if (data) {
+      return data.results.filter((item: Repository) =>
+        item.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        (typeof item.category === 'string' ? item.category.toLowerCase().includes(searchKeyword.toLowerCase()) : item.category?.name.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+        item.author.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        item.link.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    }
+    return [];
+  }, [data, searchKeyword]);
+
+  const pagination = useMemo(
     () => ({
       pageIndex,
       pageSize,
@@ -217,8 +246,8 @@ export default function AppRepositoriesTable() {
   );
 
   const table = useReactTable({
-    data: data ? data.results : Array(10).fill({}),
-    columns: isLoading
+    data: isLoading || isSearching ? Array(10).fill({}) : filteredData,
+    columns: (isLoading || isSearching)
       ? columns.map((column) => ({
         ...column,
         cell: () => <Skeleton className='h-12 w-full' />,
@@ -228,16 +257,13 @@ export default function AppRepositoriesTable() {
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: setSearchKeyword,
     pageCount: data?.count ?? -1,
     manualPagination: true,
-    manualFiltering: true,
     manualSorting: true,
     state: {
       sorting,
       rowSelection,
       pagination,
-      globalFilter: searchKeyword,
     },
   });
 

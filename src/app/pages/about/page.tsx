@@ -2,7 +2,7 @@
 import React from "react";
 import SectionTitle from "@/components/SectionTitle";
 
-export default function AboutPageContent() {
+export default function page() {
   return (
     <main>
       <section className="max-w-contentContainer py-24 mx-auto lgl:mt-20 sml:mt-10 sm:mt-10 mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">

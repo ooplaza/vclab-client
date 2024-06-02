@@ -6,7 +6,7 @@ import CustomButtonTarget from "@/components/CustomButtonTarget";
 import { Microscope } from "lucide-react"
 import SectionTitle from "@/components/SectionTitle";
 
-export default function PartnershipPageContent() {
+export default function page() {
   return (
     <>
       <section className="max-w-contentContainer py-24 mx-auto lgl:mt-20 sml:mt-10 sm:mt-10 mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">

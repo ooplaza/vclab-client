@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     ColumnDef,
     PaginationState,
@@ -17,6 +17,8 @@ import User from '@/types/User';
 import AppUserForm from './AppUserForm';
 import AppConfirmationDialog from './AppConfirmationDialog';
 import { useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash.debounce';
+
 
 export default function AppUsersTable() {
     const queryClient = useQueryClient();
@@ -30,7 +32,7 @@ export default function AppUsersTable() {
     });
     const [searchKeyword, setSearchKeyword] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     const { data, isLoading } = useUserList({
         offset: pageIndex
@@ -38,29 +40,23 @@ export default function AppUsersTable() {
 
     const { mutate } = useDeleteUser();
 
+    const debouncedSearch = useMemo(() =>
+        debounce((keyword) => {
+            setIsSearching(false);
+            setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
+        }, 1000), []
+    );
+
     useEffect(() => {
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-
-        setSearchTimeout(
-            setTimeout(() => {
-                setPagination((prevState) => ({ ...prevState, pageIndex: 0 }));
-            }, 1000)
-        );
-
-        return () => {
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-        };
-    }, [searchKeyword]);
+        setIsSearching(true);
+        debouncedSearch(searchKeyword);
+    }, [searchKeyword, debouncedSearch]);
 
     const handleDelete = (id: string) => {
         mutate(id.toString(), {
             onSettled: () => {
                 queryClient.invalidateQueries({
-                    queryKey: ['repositories']
+                    queryKey: ['users']
                 });
             }
         });
@@ -125,19 +121,23 @@ export default function AppUsersTable() {
                 const item = row.original;
                 return (
                     <div className="flex justify-center space-x-4">
-                        <Button variant="secondary" type='button' onClick={() => handleEdit(item)}>
-                            <Edit size={20} />
-                        </Button>
-                        <AppConfirmationDialog
-                            title='Delete User'
-                            description={`Are you sure you want to delete the user "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
-                            buttonElem={
-                                <Button className="text-white" variant="destructive" type='button'>
-                                    <Trash size={20} />
+                        {!isLoading && !isSearching && (
+                            <>
+                                <Button variant="secondary" type='button' onClick={() => handleEdit(item)}>
+                                    <Edit size={20} />
                                 </Button>
-                            }
-                            handleDialogAction={() => handleDelete(item.id!)}
-                        />
+                                <AppConfirmationDialog
+                                    title='Delete User'
+                                    description={`Are you sure you want to delete the user "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
+                                    buttonElem={
+                                        <Button className="text-white" variant="destructive" type='button'>
+                                            <Trash size={20} />
+                                        </Button>
+                                    }
+                                    handleDialogAction={() => handleDelete(item.id!)}
+                                />
+                            </>
+                        )}
                     </div>
                 );
             },
@@ -146,6 +146,17 @@ export default function AppUsersTable() {
         },
 
     ];
+
+    const filteredData = useMemo(() => {
+        if (data) {
+            return data.results.filter((item: User) =>
+                `${item.first_name} ${item.last_name}`.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                item.email.toLowerCase().includes(searchKeyword.toLowerCase())
+            );
+        }
+        return [];
+    }, [data, searchKeyword]);
+
 
     const pagination = React.useMemo(
         () => ({
@@ -156,17 +167,16 @@ export default function AppUsersTable() {
     );
 
     const table = useReactTable({
-        data: data?.results ?? [],
-        columns: isLoading
+        data: isLoading || isSearching ? Array(10).fill({}) : filteredData,
+        columns: (isLoading || isSearching)
             ? columns.map((column) => ({
                 ...column,
                 cell: () => <Skeleton className='h-12 w-full' />,
             }))
-            : columns,
+            : columns, 
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         onPaginationChange: setPagination,
-        onGlobalFilterChange: setSearchKeyword,
         pageCount: data?.results?.length ?? -1,
         manualPagination: true,
         manualFiltering: true,
@@ -177,6 +187,7 @@ export default function AppUsersTable() {
             globalFilter: searchKeyword,
         },
     });
+
 
     return (
         <div>

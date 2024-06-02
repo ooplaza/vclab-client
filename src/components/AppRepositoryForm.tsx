@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
     AlertDialog,
     AlertDialogContent,
@@ -19,6 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { strings } from '@/utils/strings';
 import { Repository } from '@/types/Repository';
+import AppSpinner from '@/components/AppSpinner';
 
 const repositorySchema = z.object({
     title: z.string().min(3, {
@@ -105,7 +106,7 @@ const AppRepositoryForm: FC<AppRepositoryFormProps> = ({ data, isOpen, onClose, 
 
     return (
         <AlertDialog open={isOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent className="max-h-[80vh] overflow-y-auto">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{data ? 'Edit Repository' : 'Add Repository'}</AlertDialogTitle>
                 </AlertDialogHeader>
@@ -192,7 +193,14 @@ const AppRepositoryForm: FC<AppRepositoryFormProps> = ({ data, isOpen, onClose, 
                         <div className='mt-5 flex space-x-2'>
                             <Button variant="outline" onClick={onClose}>Close</Button>
                             <Button type="submit" variant="default" className="text-white" disabled={isCreating || isUpdating}>
-                                {data ? 'Save' : 'Add'}
+                                {isCreating || isUpdating ? (
+                                    <span className="flex items-center">
+                                        <AppSpinner className='mx-auto mr-2' />
+                                        {data ? 'Saving...' : 'Adding...'}
+                                    </span>
+                                ) : (
+                                    data ? 'Save' : 'Add'
+                                )}
                             </Button>
                         </div>
                     </form>

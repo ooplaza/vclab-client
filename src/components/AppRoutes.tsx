@@ -26,11 +26,11 @@ const AppRoutes: FC<{ user: Omit<User, 'dob'> }> = ({ user }) => {
     <ul className="w-150">
       {routes
         .filter(
-          (item) => item.roles.includes(user.role) && item.isSidebarVisible
+          (item) => item.roles.includes(user.role!) && item.isSidebarVisible
         )
         .map((item) => {
           const childRoutes = item.child_routes.filter((item) =>
-            item.roles.includes(user.role)
+            item.roles.includes(user.role!)
           );
           return (
             <li

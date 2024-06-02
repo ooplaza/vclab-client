@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
     AlertDialog,
     AlertDialogContent,
@@ -19,6 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { strings } from '@/utils/strings';
 import User from "@/types/User"
+import AppSpinner from './AppSpinner';
 
 const userSchema = z.object({
     first_name: z.string().min(3, {
@@ -30,6 +31,9 @@ const userSchema = z.object({
     email: z.string().min(3, {
         message: strings.validation.required,
     }).email(),
+    password: z.string().optional(),
+    is_superuser: z.boolean().optional(),
+    is_active: z.boolean().optional(),
 });
 
 export type UserInput = z.infer<typeof userSchema>;
@@ -41,14 +45,27 @@ interface AppUserFormProps {
     queryClient: any;
 }
 
+const defaultPassword = 'Password@123';
+
 const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient }) => {
+
+    const [loading, setLoading] = useState(false)
+
     const form = useForm<UserInput>({
         resolver: zodResolver(userSchema),
         defaultValues: data ? {
             first_name: data.first_name,
             last_name: data.last_name,
             email: data.email,
-        } : undefined,
+            is_superuser: typeof data.is_superuser === 'boolean' ? data.is_superuser : data.is_superuser === 'true',
+        } : {
+            first_name: '',
+            last_name: '',
+            email: '',
+            is_superuser: false,
+            password: defaultPassword,
+            is_active: true,
+        },
     });
 
     useEffect(() => {
@@ -57,6 +74,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                 first_name: data.first_name,
                 last_name: data.last_name,
                 email: data.email,
+                is_superuser: typeof data.is_superuser === 'boolean' ? data.is_superuser : data.is_superuser === 'true',
             });
         }
     }, [data, form]);
@@ -64,33 +82,34 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
     const { mutate: createUser, isPending: isCreating } = useCreateUser();
     const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
-    const onSubmit = (formData: UserInput) => {
-        console.log("formData"), formData
-        // if (data && data.id) {
-        //     useUpdateUser({ id: data.id, userData: formData }, {
-        //         onSuccess: (response) => {
-        //             console.log('response', response);
-        //         },
-        //         onSettled: () => {
-        //             onClose();
-        //             queryClient.invalidateQueries({
-        //                 queryKey: ['users'],
-        //             });
-        //         },
-        //     });
-        // } else {
-        //     useCreateUser(formData, {
-        //         onSuccess: (response) => {
-        //             console.log('response', response);
-        //         },
-        //         onSettled: () => {
-        //             onClose();
-        //             queryClient.invalidateQueries({
-        //                 queryKey: ['users'],
-        //             });
-        //         },
-        //     });
-        // }
+    const onSubmit = async (formData: UserInput) => {
+        setLoading(true);
+        if (data && data.id) {
+            await updateUser({ id: data.id, userData: formData }, {
+                onSuccess: (response) => {
+                    console.log('response', response);
+                },
+                onSettled: () => {
+                    onClose();
+                    queryClient.invalidateQueries({
+                        queryKey: ['users'],
+                    });
+                },
+            });
+        } else {
+            await createUser(formData, {
+                onSuccess: (response) => {
+                    console.log('response', response);
+                },
+                onSettled: () => {
+                    onClose();
+                    queryClient.invalidateQueries({
+                        queryKey: ['users'],
+                    });
+                },
+            });
+        }
+        setLoading(false);
     };
 
     return (
@@ -140,11 +159,25 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                 </FormItem>
                             )}
                         />
-
+                        <FormField
+                            control={form.control}
+                            name='is_superuser'
+                            render={({ field }) => (
+                                <FormItem className="mb-5 flex items-center">
+                                    <FormControl>
+                                        <Switch id="is_superuser" onCheckedChange={field.onChange} checked={field.value} />
+                                    </FormControl>
+                                    <div className="flex items-center ml-2">
+                                        <FormLabel className="mr-2">Super User</FormLabel>
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
                         <div className='mt-5 flex space-x-2'>
                             <Button variant="outline" onClick={onClose}>Close</Button>
                             <Button type="submit" variant="default" className="text-white" disabled={isCreating || isUpdating}>
-                                {data ? 'Save' : 'Add'}
+                                {loading ? <AppSpinner /> : (data ? 'Save' : 'Add')}
                             </Button>
                         </div>
                     </form>

@@ -1,10 +1,14 @@
+"use client"
 import React from "react";
 import Image from "next/image";
 import Logo from '@public/img/logo-v2.png';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Navigation() {
+    const pathname = usePathname();
+
     const navigationItems = [
         { name: "Home", path: "/" },
         { name: "About", path: "/about" },
@@ -38,7 +42,7 @@ export default function Navigation() {
                                 {navigationItems.map((item, index) => (
                                     <li key={index}>
                                         <Link href={item.path}>
-                                            <span className="text-md hover:text-bodyColor cursor-pointer duration-300 nav-link">
+                                            <span className={`text-md hover:text-bodyColor cursor-pointer duration-300 nav-link ${pathname === item.path ? 'text-primary' : ''}`}>
                                                 {item.name}
                                             </span>
                                         </Link>
