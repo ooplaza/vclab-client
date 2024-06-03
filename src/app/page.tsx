@@ -3,11 +3,11 @@ import React from 'react';
 import Logo from '@public/img/logo-v2.png';
 import Image from 'next/image';
 import Navigation from "./navigation";
-import HomePageContent from "./pages/home/page";
-import AboutPageContent from "./pages/about/page";
-import ContactPageContent from "./pages/contact/page";
-import PartnershipPageContent from "./pages/partnership/page";
-// import ServicesPageContent from "./pages/service/page";
+import HomePageContent from "./home/page";
+import AboutPageContent from "./about/page";
+import ContactPageContent from "./contact/page";
+import PartnershipPageContent from "./partnerships/page";
+import ServicesPageContent from "./services/page";
 import { usePathname } from 'next/navigation';
 
 const Page = () => {
@@ -18,7 +18,7 @@ const Page = () => {
     '/about': <AboutPageContent />,
     '/contact': <ContactPageContent />,
     '/partnerships': <PartnershipPageContent />,
-    // '/services': <ServicesPageContent />,
+    '/services': <ServicesPageContent />,
   };
 
   return (

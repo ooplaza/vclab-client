@@ -1,16 +1,18 @@
 "use client";
 import React from "react";
 import SectionTitle from "@/components/SectionTitle";
+import Navigation from "../navigation";
 
 export default function page() {
   return (
-    <main>
+    <>
+      <Navigation />
       <section className="max-w-contentContainer py-24 mx-auto lgl:mt-20 sml:mt-10 sm:mt-10 mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">
-        <div className="mt-20 mx-6">
+        <div className="container">
           <SectionTitle
             title={"Program Overview"}
             fontSize={
-              "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl"
+              "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl mb-10"
             }
           />
           <div className="text-center">
@@ -153,6 +155,6 @@ export default function page() {
           </p>
         </div>
       </section>
-    </main >
+    </>
   );
 }
