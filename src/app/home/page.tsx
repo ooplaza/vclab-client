@@ -22,25 +22,23 @@ export default function page() {
               />
             </div>
             <div className="flex justify-center items-center flex-col xs:flex-col sm:flex-col sml:flex-row md:flex-row mdl:flex-row lg:flex-row lgl:flex-row xl:flex-row gap-4 py-8">
-              <div>
-                <CustomButton
-                  hoverClass={
-                    'font-semibold hover:bg-green-300 hover:text-bodyColor'
-                  }
-                  title={'Services'}
-                  link={'/services'}
-                  icon={<Settings className="h-6 w-6" />}
-                />
+              <div className="group inline-block">
+                <a
+                  href="/services"
+                  className="bg-white border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+                >
+                  <Settings className="h-6 w-6 mr-2 text-primary hover:text-white transition" />
+                  <span className="text-sm font-semibold">Services</span>
+                </a>
               </div>
-              <div>
-                <CustomButton
-                  hoverClass={
-                    'font-semibold hover:bg-green-300 hover:text-bodyColor'
-                  }
-                  title={'About Us'}
-                  link={'/about'}
-                  icon={<Info className="h-5 w-5" />}
-                />
+              <div className="group inline-block">
+                <a
+                  href="/about"
+                  className="bg-white border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+                >
+                  <Info className="h-5 w-5 mr-2 text-primary hover:text-white transition" />
+                  <span className="text-sm font-semibold">About Us</span>
+                </a>
               </div>
             </div>
             <div className="text-center mt-20">
