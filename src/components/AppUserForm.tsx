@@ -170,9 +170,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             if (new_password) {
                 payload = {
                     ...payload,
-                    password: new_password,
-                    new_password,
-                    confirm_password,
+                    password: new_password, 
                 };
 
                 if (new_password.length < 8) {
