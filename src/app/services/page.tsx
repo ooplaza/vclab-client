@@ -10,7 +10,7 @@ const data = [
     description:
       "Banana is one of Davao's top commodities. Known for its quality and abundance, Davao produces some of the finest bananas in the country.",
     button_title: "Explore Banana",
-    button_link: "https://www.example.com/banana",
+    button_link: "https://dev-upminaavclab.pantheonsite.io/applications-for-banana",
     button_icon: <Banana className="h-6 w-6" />,
   },
   {
@@ -18,7 +18,7 @@ const data = [
     description:
       "Davao is renowned for its rich and flavorful coffee beans. With its ideal climate and fertile soil, coffee farming thrives in the region.",
     button_title: "Explore Coffee",
-    button_link: "https://www.example.com/coffee",
+    button_link: "https://dev-upminaavclab.pantheonsite.io/coffeeapps",
     button_icon: <Bean className="h-6 w-6" />,
   },
   {
@@ -26,7 +26,7 @@ const data = [
     description:
       "Cacao cultivation is flourishing in Davao, making it a hub for high-quality cacao beans. Davao's cacao products are sought after for their distinct taste.",
     button_title: "Explore Cacao",
-    button_link: "https://www.example.com/cacao",
+    button_link: "https://dev-upminaavclab.pantheonsite.io/applications-for-cacao",
     button_icon: <CircleDot className="h-6 w-6" />,
   },
 ];
