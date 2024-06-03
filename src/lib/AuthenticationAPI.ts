@@ -50,7 +50,12 @@ export const register = async (
 ): Promise<Response> => {
   const fd = new FormData();
   for (const item in inputs) {
-    fd.append(item, inputs[item as keyof RegisterInputs]);
+    const value = inputs[item as keyof RegisterInputs];
+    if (typeof value === 'boolean') {
+      fd.append(item, String(value));
+    } else {
+      fd.append(item, value as string);
+    }
   }
   const { data } = await api.post<Response>('/api/auth/register', fd, {
     headers: {
@@ -59,6 +64,7 @@ export const register = async (
   });
   return data;
 };
+
 
 export const useRegister = () => {
   const router = useRouter();

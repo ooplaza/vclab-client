@@ -15,7 +15,7 @@ const AppHeader: FC = async () => {
     <ul className='flex items-center justify-center bg-white px-5 py-3 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.25)]'>
       <li className='flex items-center'>
         <AppNavBurger />
-        <Link href='/home' className='flex items-center space-x-2'>
+        <Link href='/dashboard' className='flex items-center space-x-2'>
           <Image src={Logo} width={180} height={180} alt='Logo' />
         </Link>
       </li>

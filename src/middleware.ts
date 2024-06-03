@@ -56,7 +56,7 @@ export default withAuth(
     if (isAuthPage) {
       if (authenticated) {
         // GO TO HOME
-        return NextResponse.redirect(new URL('/home', request.url));
+        return NextResponse.redirect(new URL('/dashboard', request.url));
       }
 
       return null;

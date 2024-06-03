@@ -16,7 +16,7 @@ interface Route {
 }
 const routes: Route[] = [
   {
-    route: '/home',
+    route: '/dashboard',
     title: 'Home',
     icon: <Home />,
     roles: ['admin', 'user'],

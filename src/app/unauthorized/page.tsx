@@ -12,7 +12,7 @@ const page: FC = async () => {
         </p>
         <p>
           Go back to the{' '}
-          <Link href={`/home`} className='font-bold text-primary underline'>
+          <Link href={`/dashboard`} className='font-bold text-primary underline'>
             Dashboard
           </Link>
         </p>

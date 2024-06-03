@@ -29,6 +29,7 @@ export default function AppRepositoriesTable() {
   const [isAddRepositoryDialogOpen, setIsAddRepositoryDialogOpen] = useState(false);
   const [isEditRepositoryDialogOpen, setIsEditRepositoryDialogOpen] = useState(false);
   const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: string]: boolean }>({});
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -88,10 +89,7 @@ export default function AppRepositoriesTable() {
           Title
         </Button>
       ),
-      cell: ({ row }) => {
-        const item = row.original;
-        return <div>{item.title}</div>;
-      },
+      cell: ({ row }) => <div>{row.original.title}</div>,
       enableSorting: true,
     },
     {
@@ -146,13 +144,21 @@ export default function AppRepositoriesTable() {
       ),
       cell: ({ row }) => {
         const item = row.original;
-        const [isExpanded, setIsExpanded] = useState(false);
+        const isExpanded = expandedDescriptions[item.id!] || false;
+
+        const toggleDescription = () => {
+          setExpandedDescriptions((prevDescriptions) => ({
+            ...prevDescriptions,
+            [item.id!]: !prevDescriptions[item.id!],
+          }));
+        };
+
         const description = isExpanded ? item.description : item.description.slice(0, 50) + (item.description.length > 50 ? '...' : '');
         return (
           <div>
             {description}
             {item.description.length > 50 && (
-              <Button variant="link" className="pl-2" onClick={() => setIsExpanded(!isExpanded)}>
+              <Button variant="link" className="pl-2" onClick={toggleDescription}>
                 {isExpanded ? 'See Less' : 'See More'}
               </Button>
             )}

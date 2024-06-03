@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import React, { useState } from "react";
 import Image from "next/image";
 import SectionTitle from "@/components/SectionTitle";
@@ -39,8 +39,7 @@ const contactSchema = z.object({
 
 export type ContactInput = z.infer<typeof contactSchema>;
 
-export default function page() {
-
+const ContactPage = () => {
   const [loading, setLoading] = useState(false)
 
   const form = useForm<ContactInput>({
@@ -160,3 +159,5 @@ export default function page() {
     </>
   );
 }
+
+export default ContactPage;

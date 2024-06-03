@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Input } from './ui/input';
 
 const AppDebouncedInput: FC<
@@ -10,17 +10,17 @@ const AppDebouncedInput: FC<
 > = ({ value: initialValue, onChange, debounce = 500, ...props }) => {
   const [value, setValue] = React.useState(initialValue);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timeout = setTimeout(() => {
       onChange(value);
     }, debounce);
 
     return () => clearTimeout(timeout);
-  }, [value]);
+  }, [value, debounce, onChange]);  
 
   return (
     <Input

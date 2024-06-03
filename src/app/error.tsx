@@ -12,7 +12,7 @@ export default function Error({ error }: { error: Error; reset: () => void }) {
           <h2 className='text-5xl font-bold'>Something went wrong!</h2>
           <p className='font-medium'>Error: {error.message}</p>
           <Link
-            href='/home'
+            href='/dashboard'
             className='flex items-center justify-center hover:text-primary'
           >
             <MoveLeft className='mr-3' /> <span>Back to Dashboard</span>

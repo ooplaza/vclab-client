@@ -13,7 +13,7 @@ export default async function NotFound() {
         <p>
           Go back to the{' '}
           <Link
-            href={session ? '/home' : '/'}
+            href={session ? '/dasboard' : '/'}
             className='font-bold text-primary underline'
           >
             Homepage

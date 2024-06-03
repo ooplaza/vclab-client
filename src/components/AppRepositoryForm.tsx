@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { strings } from '@/utils/strings';
 import { Repository } from '@/types/Repository';
 import AppSpinner from '@/components/AppSpinner';
+import { QueryClient } from '@tanstack/react-query';
 
 const repositorySchema = z.object({
     title: z.string().min(3, {
@@ -44,7 +45,7 @@ interface AppRepositoryFormProps {
     data?: Repository;
     isOpen: boolean;
     onClose: () => void;
-    queryClient: any;
+    queryClient: QueryClient;
 }
 
 const AppRepositoryForm: FC<AppRepositoryFormProps> = ({ data, isOpen, onClose, queryClient }) => {

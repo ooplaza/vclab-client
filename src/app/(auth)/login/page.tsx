@@ -11,7 +11,7 @@ const page: FC = async () => {
   const session = await getServerSession(AuthOptions);
 
   if (session) {
-    redirect('/home');
+    redirect('/dashboard');
   }
 
   return (

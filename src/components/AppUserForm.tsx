@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { strings } from '@/utils/strings';
 import User from "@/types/User"
 import AppSpinner from './AppSpinner';
+import { QueryClient } from '@tanstack/react-query';
 
 const userSchema = z.object({
     first_name: z.string().min(3, {
@@ -42,7 +43,7 @@ interface AppUserFormProps {
     data?: User;
     isOpen: boolean;
     onClose: () => void;
-    queryClient: any;
+    queryClient: QueryClient;
 }
 
 const defaultPassword = 'Password@123';

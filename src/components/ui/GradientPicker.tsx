@@ -1,5 +1,4 @@
-'use client'
-
+import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -11,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from "@/utils/cn"
 import { Paintbrush } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 
 export function GradientPicker({
   background,
@@ -60,10 +58,8 @@ export function GradientPicker({
   ]
 
   const defaultTab = useMemo(() => {
-    /* if (background.includes('url')) return 'image'
-    if (background.includes('gradient')) return 'gradient' */
-    return 'solid'
-  }, [background])
+    return 'solid';
+  }, []);
 
   return (
     <Popover>
@@ -97,12 +93,6 @@ export function GradientPicker({
             <TabsTrigger className="flex-1" value="solid">
               Solid
             </TabsTrigger>
-            {/* <TabsTrigger className="flex-1" value="gradient">
-              Gradient
-            </TabsTrigger>
-            <TabsTrigger className="flex-1" value="image">
-              Image
-            </TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="solid" className="flex flex-wrap gap-1 mt-0">
@@ -115,56 +105,6 @@ export function GradientPicker({
               />
             ))}
           </TabsContent>
-
-          <TabsContent value="gradient" className="mt-0">
-            <div className="flex flex-wrap gap-1 mb-2">
-              {gradients.map((s) => (
-                <div
-                  key={s}
-                  style={{ background: s }}
-                  className="rounded-md h-6 w-6 cursor-pointer active:scale-105"
-                  onClick={() => setBackground(s)}
-                />
-              ))}
-            </div>
-
-            <GradientButton background={background}>
-              💡 Get more at{' '}
-              <Link
-                href="https://gradient.page/css/ui-gradients"
-                className="hover:underline font-bold"
-                target="_blank"
-              >
-                Gradient Page
-              </Link>
-            </GradientButton>
-          </TabsContent>
-
-          <TabsContent value="image" className="mt-0">
-            <div className="grid grid-cols-2 gap-1 mb-2">
-              {images.map((s) => (
-                <div
-                  key={s}
-                  style={{ backgroundImage: s }}
-                  className="rounded-md bg-cover bg-center h-12 w-full cursor-pointer active:scale-105"
-                  onClick={() => setBackground(s)}
-                />
-              ))}
-            </div>
-
-            <GradientButton background={background}>
-              🎁 Get abstract{' '}
-              <Link
-                href="https://gradient.page/wallpapers"
-                className="hover:underline font-bold"
-                target="_blank"
-              >
-                wallpapers
-              </Link>
-            </GradientButton>
-          </TabsContent>
-
-          <TabsContent value="password">Change your password here.</TabsContent>
         </Tabs>
 
         <Input
