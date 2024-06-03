@@ -55,14 +55,12 @@ export default function page() {
                   up-to-date information, and to report initial farm conditions.
                 </p>
                 <div className="mt-10">
-                  <CustomButtonTarget
-                    hoverClass={
-                      "font-semibold hover:bg-green-200 hover:text-bodyColor"
-                    }
-                    title={"Explore"}
-                    link={"https://sarai.ph/"}
-                    icon={<Microscope className="animate-spin h-5 w-5" />}
-                  />
+                  <button
+                    type="submit"
+                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300"
+                  >
+                    Explore
+                  </button>
                 </div>
               </div>
             </div>

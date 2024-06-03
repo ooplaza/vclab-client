@@ -145,7 +145,7 @@ const ContactPage = () => {
 
                   <button
                     type="submit"
-                    className="mt-4 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300"
                     disabled={loading}
                   >
                     {loading ? 'Sending...' : 'Submit'}
