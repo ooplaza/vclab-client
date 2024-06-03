@@ -115,6 +115,20 @@ export default function AppUsersTable() {
             enableSorting: true,
         },
         {
+            accessorKey: 'user_type',
+            header: () => (
+                <div className='text-left'>
+                    Role
+                </div>
+            ),
+            cell: ({ row }) => {
+                const item = row.original;
+                const userType = item.is_superuser ? "Admin" : "User";
+                return <div>{userType}</div>;
+            },
+            enableSorting: false,
+        },
+        {
             id: 'actions',
             header: () => <div className='text-center'>Actions</div>,
             cell: ({ row }) => {
@@ -173,7 +187,7 @@ export default function AppUsersTable() {
                 ...column,
                 cell: () => <Skeleton className='h-12 w-full' />,
             }))
-            : columns, 
+            : columns,
         onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         onPaginationChange: setPagination,

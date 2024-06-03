@@ -64,7 +64,7 @@ const LoginForm: FC = () => {
         variant: 'destructive',
       });
     } else {
-      router.push('/dasboard');
+      router.push('/dashboard');
     }
   };
 
