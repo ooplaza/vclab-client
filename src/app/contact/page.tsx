@@ -62,7 +62,7 @@ const ContactPage = () => {
   return (
     <>
       <Navigation />
-      <section className="max-w-contentContainer py-24 mx-auto lgl:mt-20 sml:mt-10 sm:mt-10 mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">
+      <section className="max-w-contentContainer py-24 mx-auto mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">
         <div className="container">
           <div className="mt-20 mx-6">
             <div className="text-center">
