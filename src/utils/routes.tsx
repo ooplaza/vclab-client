@@ -27,7 +27,7 @@ const routes: Route[] = [
     route: '/repository-list',
     title: 'Repository',
     icon: <FolderKanban />,
-    roles: ['admin'],
+    roles: ['user', 'admin'],
     isSidebarVisible: true,
     child_routes: [],
   },
