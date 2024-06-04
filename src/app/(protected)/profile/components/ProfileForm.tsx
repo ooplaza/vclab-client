@@ -21,20 +21,18 @@ const inputSchema = z.object({
   first_name: z.string({ required_error: strings.validation.required }).min(1, { message: strings.validation.required }),
   last_name: z.string({ required_error: strings.validation.required }).min(1, { message: strings.validation.required }),
   email: z.string({ required_error: strings.validation.required }).email().min(1, { message: strings.validation.required }),
-  confirm_password: z.string().nullish().transform((v) => v ?? ''),
-  new_password: z.string().nullish().transform((v) => v ?? ''),
-}).refine(data => data.confirm_password.length <= 0 && data.new_password.length > 0 ? false : true, {
-  message: 'Please fill out the confirm password field',
-  path: ['confirm_password'],
-}).refine(data => data.confirm_password.length > 0 && data.new_password.length <= 0 ? false : true, {
-  message: 'Please fill out the new password field',
-  path: ['new_password'],
+  password: z.string().optional(),
+  new_password: z.string().optional(),
+  confirm_password: z.string().optional(),
+}).refine(data => data.new_password === data.confirm_password, {
+  message: "Passwords don't match",
+  path: ["confirm_password"],
 });
+
 
 export type ProfileFormInputs = z.infer<typeof inputSchema>;
 
 const ProfileForm: FC<{ user: User }> = ({ user }) => {
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   const form = useForm<ProfileFormInputs>({
@@ -61,10 +59,17 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
     });
   }, [user, form]);
 
-  const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
+  const { mutate: updateUser, isPending } = useUpdateUser();
 
   const onSubmit = (inputs: ProfileFormInputs) => {
     if (user.id) {
+      if (inputs.new_password && inputs.confirm_password) {
+        inputs.password = inputs.new_password;
+      }
+
+      delete inputs.new_password;
+      delete inputs.confirm_password;
+
       updateUser(
         { id: user.id, userData: inputs },
         {
@@ -80,6 +85,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
       );
     }
   };
+
 
   return (
     <>
@@ -150,9 +156,9 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
             <AlertDialogDescription>You will be logged out after this action</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading}>No</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>No</AlertDialogCancel>
             <AlertDialogAction className="text-white" onClick={() => form.handleSubmit(onSubmit)()}>
-              {loading ? <AppSpinner /> : 'Continue'}
+              {isPending ? <AppSpinner /> : 'Continue'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

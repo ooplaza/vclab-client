@@ -6,6 +6,7 @@ import CustomButtonTarget from "@/components/CustomButtonTarget";
 import { Microscope } from "lucide-react"
 import SectionTitle from "@/components/SectionTitle";
 import Navigation from "../navigation";
+import Footer from "../footer";
 
 export default function page() {
   return (
@@ -17,7 +18,7 @@ export default function page() {
             <SectionTitle
               title="PARTNERSHIPS & LINKAGES"
               fontSize={
-                "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl tracking-wider"
+                "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl tracking-wider mt-20 md:mt-0"
               }
             />
           </div>
@@ -67,6 +68,7 @@ export default function page() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

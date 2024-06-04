@@ -5,6 +5,8 @@ import { UserPaginatedData } from '@/types/User';
 import { UserInput } from '@/components/AppUserForm';
 import Response from '@/types/Response';
 import { toast } from '@/components/ui/use-toast';
+import { getServerSession } from 'next-auth';
+import AuthOptions from '@/lib/AuthOptions';
 
 export const getUserList = async (params: Pagination): Promise<UserPaginatedData> => {
   const { data } = await api.get<UserPaginatedData>(`/api/auth/users`, {
@@ -56,13 +58,14 @@ export const useUpdateUser = () => {
     mutationFn: async ({ id, userData }: { id: string; userData: UserInput }) => {
       return await updateUser(id, userData);
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response && response.status === true) {
         toast({
           variant: 'success',
           description: response.message,
         });
       }
+      await getServerSession(AuthOptions);
     },
   });
 };

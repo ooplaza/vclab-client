@@ -21,6 +21,8 @@ import { Textarea } from '@/components/ui/textarea';
 import Navigation from "../navigation";
 import { useSendEmail } from "@/lib/ContactAPI";
 import AppSpinner from "@/components/AppSpinner";
+import Footer from "../footer";
+import { Button } from '@/components/ui/button';
 
 const contactSchema = z.object({
   name: z.string().min(1, {
@@ -53,11 +55,15 @@ const ContactPage = () => {
     sendEmail(data, {
       onSuccess: () => {
         form.reset();
+        setLoading(false);
+      },
+      onSettled: () => {
+        form.reset();
+        setLoading(false);
       },
     })
-    setLoading(false)
-
   };
+
 
   return (
     <>
@@ -143,19 +149,26 @@ const ContactPage = () => {
                     )}
                   />
 
-                  <button
-                    type="submit"
-                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300"
+                  <Button
+                    type='submit'
+                    variant='default'
+                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300 relative"
                     disabled={loading}
                   >
-                    {loading ? 'Sending...' : 'Submit'}
-                  </button>
+                    {loading ? (
+                      <div className="flex items-center">
+                        <AppSpinner className='mx-auto' />
+                        <span className="ml-2">Sending ...</span>
+                      </div>
+                    ) : 'Send'}
+                  </Button> 
                 </form>
               </Form>
             </div>
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

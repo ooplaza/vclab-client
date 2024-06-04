@@ -2,6 +2,7 @@
 import React from "react";
 import SectionTitle from "@/components/SectionTitle";
 import Navigation from "../navigation";
+import Footer from "../footer";
 
 export default function page() {
   return (
@@ -12,7 +13,7 @@ export default function page() {
           <SectionTitle
             title={"Program Overview"}
             fontSize={
-              "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl mb-10"
+              "text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl mb-10 mt-20 md:mt-0"
             }
           />
           <div className="text-center">
@@ -20,10 +21,10 @@ export default function page() {
               title={
                 "Enhancing the Value Chain Project Designs for Coffee, Cacao, and Cavendish Banana Towards the Development of Agri-Aqua Value Chain Laboratory in UP Mindanao"
               }
-              fontSize={"text-xl"}
+              fontSize={"text-xl sm:text-lg xs:text-base"}
             />
           </div>
-          <p className="mt-10">
+          <p className="mt-10 text-base sm:text-sm xs:text-xs">
             This program will contribute to new ways of evaluation that
             account for the dynamics in the chain and develop models to aid
             decision-making and develop more effective upgrading strategies
@@ -42,25 +43,25 @@ export default function page() {
           </p>
 
           <div className="text-center mt-20">
-            <SectionTitle title={"Project 1"} fontSize={"text-3xl"} />
+            <SectionTitle title={"Project 1"} fontSize={"text-3xl sm:text-2xl xs:text-xl"} />
             <div className="mb-10">
               <SectionTitle
                 title={"Project Leader: Dr. Larry N. Digal"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
               <SectionTitle
                 title={"Science Research Specialist II: Marvin Louie Orbeta"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
             </div>
             <SectionTitle
               title={
                 "Value Chain Analysis and Development: Cacao, Coffee, and Cavendish Banana"
               }
-              fontSize={"text-xl"}
+              fontSize={"text-xl sm:text-lg xs:text-base"}
             />
           </div>
-          <p className="mt-10">
+          <p className="mt-10 text-base sm:text-sm xs:text-xs">
             For the three chains, updating includes utilizing previous survey
             data to examine the role of consolidation and clusters. Factors
             affecting the decision to cluster will be examined using a logit
@@ -77,29 +78,29 @@ export default function page() {
           </p>
 
           <div className="text-center mt-20">
-            <SectionTitle title={"Project 2"} fontSize={"text-3xl"} />
+            <SectionTitle title={"Project 2"} fontSize={"text-3xl sm:text-2xl xs:text-xl"} />
             <div className="mb-10">
               <SectionTitle
                 title={"Project Leader: Dr. Giovanna Fae Oguis"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
               <SectionTitle
                 title={"Project Staff: El Veena Grace Rosero"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
               <SectionTitle
                 title={"Science Research Analyst: Novy Aila Rivas"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
             </div>
             <SectionTitle
               title={
                 "Value Chain Modelling and Simulations: Cacao, Coffee, and Cavendish Banana"
               }
-              fontSize={"text-xl"}
+              fontSize={"text-xl sm:text-lg xs:text-base"}
             />
           </div>
-          <p className="mt-10">
+          <p className="mt-10 text-base sm:text-sm xs:text-xs">
             This project aims to develop models of agri-food value chains that
             will aid decision-making and evaluation of the chain. This project
             will focus on developing models of at most three chains: Cavendish
@@ -112,25 +113,25 @@ export default function page() {
             will support in the improvement of the studied chains.
           </p>
           <div className="text-center mt-20">
-            <SectionTitle title={"Project 3"} fontSize={"text-3xl"} />
+            <SectionTitle title={"Project 3"} fontSize={"text-3xl sm:text-2xl xs:text-xl"} />
             <div className="mb-10">
               <SectionTitle
                 title={"Project Leader: Jon Henly O. Santillan"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
               <SectionTitle
                 title={"Science Research Analyst: Alex John Labanon"}
-                fontSize={"text-md font-semibold"}
+                fontSize={"text-md sm:text-sm xs:text-xs font-semibold"}
               />
             </div>
             <SectionTitle
               title={
                 "Data analytics for the Cacao, Coffee, and Cavendish Banana Value Chains"
               }
-              fontSize={"text-xl"}
+              fontSize={"text-xl sm:text-lg xs:text-base"}
             />
           </div>
-          <p className="mt-10">
+          <p className="mt-10 text-base sm:text-sm xs:text-xs">
             This project covers the data analytics component of the proposed
             program. It will build on the updated analysis of the banana
             (Cavendish banana), cacao, and coffee value chains by developing
@@ -155,6 +156,7 @@ export default function page() {
           </p>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

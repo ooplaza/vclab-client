@@ -24,8 +24,14 @@ import AppConfirmationDialog from './AppConfirmationDialog';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';
 
-export default function AppRepositoriesTable() {
+interface AppRepositoriesTableProps {
+  userRole: string;
+}
+
+const AppRepositoriesTable: React.FC<AppRepositoriesTableProps> = ({ userRole }) => {
+
   const queryClient = useQueryClient();
+
   const [isAddRepositoryDialogOpen, setIsAddRepositoryDialogOpen] = useState(false);
   const [isEditRepositoryDialogOpen, setIsEditRepositoryDialogOpen] = useState(false);
   const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
@@ -204,10 +210,10 @@ export default function AppRepositoriesTable() {
     },
     {
       id: 'actions',
-      header: () => <div className='text-center'>Actions</div>,
+      header: () => userRole === 'admin' ? <div className='text-center'>Actions</div> : null,
       cell: ({ row }) => {
         const item = row.original;
-        return (
+        return userRole === 'admin' ? (
           <div className="flex justify-center space-x-4">
             <Button variant="secondary" type='button' onClick={() => handleEdit(item)}>
               <Edit size={20} />
@@ -223,7 +229,7 @@ export default function AppRepositoriesTable() {
               handleDialogAction={() => handleDelete(item.id!)}
             />
           </div>
-        );
+        ) : null;
       },
       enableSorting: false,
       enableHiding: false,
@@ -286,7 +292,9 @@ export default function AppRepositoriesTable() {
           />
         </div>
         <div>
-          <Button variant="default" className="text-white" onClick={() => { setIsAddRepositoryDialogOpen(true) }}>Add Repository</Button>
+          {userRole === 'admin' && (
+            <Button variant="default" className="text-white" onClick={() => { setIsAddRepositoryDialogOpen(true) }}>Add Repository</Button>
+          )}
           {
             isAddRepositoryDialogOpen && (
               <AppRepositoryForm
@@ -312,4 +320,6 @@ export default function AppRepositoriesTable() {
       <AppTable table={table} />
     </div>
   );
-}
+};
+
+export default AppRepositoriesTable;

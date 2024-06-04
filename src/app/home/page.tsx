@@ -5,6 +5,7 @@ import { Info, Settings } from 'lucide-react';
 import SectionTitle from '@/components/SectionTitle';
 import CustomButton from '@/components/CustomButton';
 import Navigation from '../navigation';
+import Footer from '../footer';
 
 export default function page() {
   return (
@@ -67,6 +68,7 @@ export default function page() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

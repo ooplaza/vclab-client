@@ -3,12 +3,13 @@ import React from "react";
 import SectionTitle from "@/components/SectionTitle";
 import { Banana, Bean, CircleDot } from 'lucide-react';
 import Navigation from "../navigation";
+import Footer from "../footer";
 
 const data = [
   {
     title: "Banana",
     description:
-      "Banana is one of Davao's top commodities. Known for its quality and abundance, Davao produces some of the finest bananas in the country.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
     button_title: "Explore Banana",
     button_link: "https://dev-upminaavclab.pantheonsite.io/applications-for-banana",
     button_icon: <Banana className="h-6 w-6" />,
@@ -16,7 +17,7 @@ const data = [
   {
     title: "Coffee",
     description:
-      "Davao is renowned for its rich and flavorful coffee beans. With its ideal climate and fertile soil, coffee farming thrives in the region.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
     button_title: "Explore Coffee",
     button_link: "https://dev-upminaavclab.pantheonsite.io/coffeeapps",
     button_icon: <Bean className="h-6 w-6" />,
@@ -24,7 +25,7 @@ const data = [
   {
     title: "Cacao",
     description:
-      "Cacao cultivation is flourishing in Davao, making it a hub for high-quality cacao beans. Davao's cacao products are sought after for their distinct taste.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
     button_title: "Explore Cacao",
     button_link: "https://dev-upminaavclab.pantheonsite.io/applications-for-cacao",
     button_icon: <CircleDot className="h-6 w-6" />,
@@ -38,8 +39,8 @@ export default function Commodities() {
       <section className="max-w-contentContainer py-24 mx-auto lgl:mt-20 sml:mt-10 sm:mt-10 mdl:py-24 flex flex-col gap-4 lgl:gap-8 mdl:px-10 xl:px-4">
         <div className="container">
           <SectionTitle
-            title={"Davao's Top Commodities"}
-            fontSize={"text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl"}
+            title={"Commodities"}
+            fontSize={"text-4xl lgl:text-5xl md:text-4xl sm:text-3xl xs:text-2xl mt-20 md:mt-0"}
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
             {data.map((item, index) => (
@@ -62,6 +63,7 @@ export default function Commodities() {
           </div>
         </div>
       </section>
+      <Footer />
     </>
   );
 }

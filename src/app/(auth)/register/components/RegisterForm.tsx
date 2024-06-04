@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useRegister } from '@/lib/AuthenticationAPI';
 import AppSpinner from '@/components/AppSpinner';
 import { strings } from '@/utils/strings';
+import { useRouter } from 'next/navigation';
 
 const inputSchema = z.object({
   first_name: z.string({
@@ -28,9 +29,6 @@ const inputSchema = z.object({
   email: z.string({
     required_error: strings.validation.required,
   }).email(),
-  username: z.string({
-    required_error: strings.validation.required,
-  }).min(3, strings.validation.required),
   password: z.string({
     required_error: strings.validation.required,
     invalid_type_error: strings.validation.required,
@@ -57,23 +55,32 @@ const inputSchema = z.object({
   }).optional().default(''),
   is_active: z.boolean().optional().default(true),
   is_supervisor: z.boolean().optional().default(false),
+}).refine(data => data.password === data.password_confirmation, {
+  message: "Passwords don't match",
+  path: ["password_confirmation"],
 });
 
 export type RegisterInputs = z.infer<typeof inputSchema>;
 
 const RegisterForm: FC = () => {
+  const router = useRouter();
   const form = useForm<RegisterInputs>({
     resolver: zodResolver(inputSchema),
   });
 
-  const { mutate, isPending } = useRegister();
+  const { mutate: register, isPending } = useRegister();
 
-  const onSubmit = async (inputs: RegisterInputs) => {
-    mutate({
-      inputs,
-    });
+  const onSubmit = async (inputs: RegisterInputs) => { 
+    await register({ inputs }, {
+      onSuccess: (response) => {
+        console.log('response', response);
+        form.reset();
+      },
+      onSettled: () => {
+        form.reset();
+      }
+    })
 
-    form.reset();
   };
 
   return (
@@ -118,40 +125,25 @@ const RegisterForm: FC = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='font-medium'>Email address</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='email'
-                      {...field}
-                      className='w-full border-border focus-visible:ring-offset-0'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='username'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='font-medium'>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='text'
-                      {...field}
-                      className='w-full border-border focus-visible:ring-offset-0'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="col-span-2">
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='font-medium'>Email address</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='email'
+                        {...field}
+                        className='w-full border-border focus-visible:ring-offset-0'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name='password'

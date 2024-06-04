@@ -1,7 +1,5 @@
 "use client"
 import React from 'react';
-import Logo from '@public/img/logo-v2.png';
-import Image from 'next/image';
 import Navigation from "./navigation";
 import HomePageContent from "./home/page";
 import AboutPageContent from "./about/page";
@@ -9,6 +7,7 @@ import ContactPageContent from "./contact/page";
 import PartnershipPageContent from "./partnerships/page";
 import ServicesPageContent from "./services/page";
 import { usePathname } from 'next/navigation';
+import Footer from './footer';
 
 const Page = () => {
   const pathname = usePathname();
@@ -26,23 +25,7 @@ const Page = () => {
       <Navigation />
       <main className='py-20'>
         {contentComponents[pathname] || <div>Page Not Found</div>}
-      </main>
-      <footer className='py-4 text-center'>
-        <div className='flex items-center justify-center'>
-          <span className='mr-3'>
-            <Image
-              src={Logo}
-              alt='Logo'
-              quality={100}
-              width={200}
-              height={200}
-            />
-          </span>
-          <span className='text-sm font-medium text-[#6B7280]'>
-            © {new Date().getFullYear()} VC Lab
-          </span>
-        </div>
-      </footer>
+      </main> 
     </>
   );
 };
