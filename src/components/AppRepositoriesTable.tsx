@@ -238,16 +238,26 @@ const AppRepositoriesTable: React.FC<AppRepositoriesTableProps> = ({ userRole })
 
   const filteredData = useMemo(() => {
     if (data) {
-      return data.results.filter((item: Repository) =>
-        item.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        (typeof item.category === 'string' ? item.category.toLowerCase().includes(searchKeyword.toLowerCase()) : item.category?.name.toLowerCase().includes(searchKeyword.toLowerCase())) ||
-        item.author.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.link.toLowerCase().includes(searchKeyword.toLowerCase())
-      );
+      return data.results.filter((item: Repository) => {
+        const lowerSearchKeyword = searchKeyword.toLowerCase();
+        const lowerTitle = (item.title || '').toLowerCase();
+        const lowerCategory = typeof item.category === 'string' ? (item.category || '').toLowerCase() : (item.category?.name || '').toLowerCase();
+        const lowerAuthor = (item.author || '').toLowerCase();
+        const lowerDescription = (item.description || '').toLowerCase();
+        const lowerLink = (item.link || '').toLowerCase();
+
+        return (
+          lowerTitle.includes(lowerSearchKeyword) ||
+          lowerCategory.includes(lowerSearchKeyword) ||
+          lowerAuthor.includes(lowerSearchKeyword) ||
+          lowerDescription.includes(lowerSearchKeyword) ||
+          lowerLink.includes(lowerSearchKeyword)
+        );
+      });
     }
     return [];
   }, [data, searchKeyword]);
+
 
   const pagination = useMemo(
     () => ({

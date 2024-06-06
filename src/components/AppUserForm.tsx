@@ -117,7 +117,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             last_name: '',
             email: '',
             is_superuser: false,
-            password: defaultPassword,
+            password: '',
             new_password: '',
             confirm_password: '',
         },
@@ -147,7 +147,6 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
 
         let payload: UserInput = {
             ...rest,
-            password: rest.password || defaultPassword,
         };
 
         if (!data || !data.id) {
@@ -170,13 +169,15 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             if (new_password) {
                 payload = {
                     ...payload,
-                    password: new_password, 
+                    password: new_password,
                 };
 
                 if (new_password.length < 8) {
                     setLoading(false);
                     return;
                 }
+            } else { 
+                delete payload.password;
             }
         }
 
@@ -193,6 +194,13 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                 },
             });
         } else {
+            if (!new_password) {
+                payload = {
+                    ...payload,
+                    password: defaultPassword,
+                };
+            }
+
             await createUser(payload, {
                 onSuccess: (response) => {
                     console.log('response', response);
@@ -206,8 +214,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             });
         }
         setLoading(false);
-    };
-
+    }
 
 
     return (
