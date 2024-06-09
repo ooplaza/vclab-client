@@ -140,45 +140,25 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
     const { mutate: createUser, isPending: isCreating } = useCreateUser();
     const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
+
     const onSubmit = async (formData: UserInput) => {
         setLoading(true);
 
-        const { new_password, confirm_password, ...rest } = formData;
-
-        let payload: UserInput = {
-            ...rest,
-        };
+        const payload: UserInput = { ...formData };
 
         if (!data || !data.id) {
-            if (!new_password || !confirm_password) {
-                setLoading(false);
-                return;
-            }
-
-            payload = {
-                ...payload,
-                new_password,
-                confirm_password,
-            };
-
-            if (new_password.length < 8) {
-                setLoading(false);
-                return;
-            }
+            payload.password = defaultPassword;
+            delete payload.new_password;
+            delete payload.confirm_password;
         } else {
-            if (new_password) {
-                payload = {
-                    ...payload,
-                    password: new_password,
-                };
-
-                if (new_password.length < 8) {
-                    setLoading(false);
-                    return;
-                }
-            } else { 
+            if (payload.new_password) {
+                payload.password = payload.new_password;
+            } else {
                 delete payload.password;
             }
+
+            delete payload.new_password;
+            delete payload.confirm_password;
         }
 
         if (data && data.id) {
@@ -194,13 +174,6 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                 },
             });
         } else {
-            if (!new_password) {
-                payload = {
-                    ...payload,
-                    password: defaultPassword,
-                };
-            }
-
             await createUser(payload, {
                 onSuccess: (response) => {
                     console.log('response', response);
@@ -215,8 +188,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
         }
         setLoading(false);
     }
-
-
+ 
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogContent>
@@ -265,32 +237,39 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name='new_password'
-                                render={({ field }) => (
-                                    <FormItem className="mb-3">
-                                        <FormLabel>New Password</FormLabel>
-                                        <FormControl>
-                                            <Input type='password' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='confirm_password'
-                                render={({ field }) => (
-                                    <FormItem className="mb-5">
-                                        <FormLabel>Confirm Password</FormLabel>
-                                        <FormControl>
-                                            <Input type='password' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            {
+                                data && (
+                                    <>
+                                        <FormField
+                                            control={form.control}
+                                            name='new_password'
+                                            render={({ field }) => (
+                                                <FormItem className="mb-3">
+                                                    <FormLabel>New Password</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='password' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name='confirm_password'
+                                            render={({ field }) => (
+                                                <FormItem className="mb-5">
+                                                    <FormLabel>Confirm Password</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='password' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </>
+                                )
+                            }
+
                             <FormField
                                 control={form.control}
                                 name='is_superuser'

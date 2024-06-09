@@ -43,8 +43,7 @@ export default function Navigation() {
                         </Link>
                     </div>
                     <div className='float-right flex items-center'>
-                        {/* Render navigation links for larger screens */}
-                        <nav className="mr-6 hidden sm:block md:block">
+                        <nav className="mr-6 hidden sm:hidden md:block">
                             <ul className='flex space-x-4 flex-col  md:flex-row'>
                                 {navigationItems.map((item, index) => (
                                     <li key={index}>
@@ -58,7 +57,6 @@ export default function Navigation() {
                             </ul>
                         </nav>
 
-                        {/* Render menu icon and navigation links for smaller screens */}
                         <div className="sm:block md:hidden">
                             <Sheet>
                                 <SheetTrigger>
@@ -83,25 +81,29 @@ export default function Navigation() {
                                                 </span>
                                             </Link>
                                         </SheetTitle>
-                                        <SheetDescription>
-                                            <ul className='flex space-x-4 flex-col sm:block md:flex-row'>
-                                                {navigationItems.map((item, index) => (
-                                                    <li key={index}>
-                                                        <Link href={item.path}>
-                                                            <span className={`text-md hover:text-bodyColor cursor-pointer duration-300 nav-link ${pathname === item.path ? 'text-primary' : ''}`}>
-                                                                {item.name}
-                                                            </span>
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </SheetDescription>
                                     </SheetHeader>
+                                    <SheetDescription>
+                                        <ul className='flex flex-col space-y-4'>
+                                            {navigationItems.map((item, index) => (
+                                                <li key={index}>
+                                                    <Link href={item.path}>
+                                                        <span className={`text-md hover:text-bodyColor cursor-pointer duration-300 nav-link ${pathname === item.path ? 'text-primary' : ''}`}>
+                                                            {item.name}
+                                                        </span>
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <Link href='/login' passHref>
+                                            <Button className='rounded-lg text-white w-full mt-5'>
+                                                Login
+                                            </Button>
+                                        </Link>
+                                    </SheetDescription>
                                 </SheetContent>
                             </Sheet>
                         </div>
-
-                        {/* Render login button */}
+ 
                         <Link href='/login' passHref>
                             <Button className='rounded-lg text-white hidden md:block'>
                                 Login
