@@ -1,3 +1,4 @@
+"use client"
 import AuthOptions from '@/lib/AuthOptions';
 import { getServerSession } from 'next-auth';
 import React, { ReactNode, useEffect, useState } from 'react';
