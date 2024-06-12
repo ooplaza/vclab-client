@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client"
+import React, { useState, useEffect, FC } from "react";
 import Image from "next/image";
 import Logo from '@public/img/logo-v2.png';
 import Link from 'next/link';
@@ -6,10 +7,25 @@ import { usePathname } from 'next/navigation';
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { getSession } from 'next-auth/react';
+import { Session } from 'next-auth';
 
-export default function Navigation() {
+const Navigation: FC = () => {
     const pathname = usePathname();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [session, setSession] = useState<Session | null>(null);
+
+    useEffect(() => {
+        const fetchSession = async () => {
+            try {
+                const sessionData = await getSession();
+                setSession(sessionData);
+            } catch (error) {
+                console.error('Error fetching session:', error);
+            }
+        };
+        fetchSession();
+    }, []);
 
     const navigationItems = [
         { name: "Home", path: "/" },
@@ -44,7 +60,7 @@ export default function Navigation() {
                     </div>
                     <div className='float-right flex items-center'>
                         <nav className="mr-6 hidden sm:hidden md:block">
-                            <ul className='flex space-x-4 flex-col  md:flex-row'>
+                            <ul className='flex space-x-4 flex-col md:flex-row'>
                                 {navigationItems.map((item, index) => (
                                     <li key={index}>
                                         <Link href={item.path}>
@@ -58,8 +74,8 @@ export default function Navigation() {
                         </nav>
 
                         <div className="sm:block md:hidden">
-                            <Sheet>
-                                <SheetTrigger>
+                            <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                                <SheetTrigger asChild>
                                     <span className="text-md hover:text-bodyColor cursor-pointer duration-300 nav-link">
                                         <Menu onClick={toggleDrawer} size="32" />
                                     </span>
@@ -94,19 +110,19 @@ export default function Navigation() {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <Link href='/login' passHref>
+                                        <Link href={session ? '/dashboard' : '/login'} passHref>
                                             <Button className='rounded-lg text-white w-full mt-5'>
-                                                Login
+                                                {session ? 'Dashboard' : 'Login'}
                                             </Button>
                                         </Link>
                                     </SheetDescription>
                                 </SheetContent>
                             </Sheet>
                         </div>
- 
-                        <Link href='/login' passHref>
+
+                        <Link href={session ? '/dashboard' : '/login'} passHref>
                             <Button className='rounded-lg text-white hidden md:block'>
-                                Login
+                                {session ? 'Dashboard' : 'Login'}
                             </Button>
                         </Link>
                     </div>
@@ -114,4 +130,6 @@ export default function Navigation() {
             </div>
         </header>
     );
-}
+};
+
+export default Navigation;
