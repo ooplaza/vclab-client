@@ -1,34 +1,16 @@
-"use client"
 import AuthOptions from '@/lib/AuthOptions';
 import { getServerSession } from 'next-auth';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 
-interface LayoutProps {
-  admin: ReactNode;
-  user: ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ admin, user }) => {
-  const [session, setSession] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const sessionData = await getServerSession(AuthOptions);
-        setSession(sessionData);
-      } catch (error) {
-        console.error('Error fetching session:', error);
-      }
-    };
-    fetchSession();
-  }, []);
+const Layout: FC<{
+  admin: React.ReactNode;
+}> = async ({ admin }) => {
+  const session = await getServerSession(AuthOptions);
 
   const renderContent = () => {
-    switch (session?.user?.role) {
+    switch (session?.user.role) {
       case 'admin':
         return admin;
-      case 'user':
-        return user;
       default:
         return null;
     }
