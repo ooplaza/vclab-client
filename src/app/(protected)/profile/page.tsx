@@ -4,28 +4,23 @@ import { api } from '@/lib/api';
 import ProfileForm from './components/ProfileForm';
 
 const page = async () => {
-  return null;
-  try {
+  const response = await api.get<UserResponse>(`/api/auth/profile`);
+  const userData = response.data.data;
 
-    const response = await api.get<UserResponse>(`/api/auth/profile`);
-
-    const userData = response.data.data;
-
-    return (
-      <>
-        <h1 className='text-[2rem] font-bold'>Edit Profile</h1>
-        <ProfileForm user={userData} />
-      </>
-    );
-  } catch (error) {
-    console.error('Error fetching profile:', error);
+  if (!userData)
     return (
       <>
         <h1 className='text-[2rem] font-bold'>Edit Profile</h1>
         <p>Error fetching profile. Please try again.</p>
       </>
     );
-  }
+
+  return (
+    <>
+      <h1 className='text-[2rem] font-bold'>Edit Profile</h1>
+      <ProfileForm user={userData} />
+    </>
+  );
 };
 
 
