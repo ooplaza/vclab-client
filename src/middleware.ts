@@ -11,7 +11,7 @@ export default withAuth(
       request.nextUrl.pathname.startsWith('/register');
     let isRouteFound = false;
 
-    // CHECK IF ROUTE FOUND
+    /* // CHECK IF ROUTE FOUND
     routes.forEach((item) => {
       if (request.nextUrl.pathname.startsWith(item.route)) {
         // SET BOOL
@@ -66,7 +66,7 @@ export default withAuth(
       if (request.nextUrl.pathname !== '/') {
         return NextResponse.redirect(new URL(`/login`, request.url));
       }
-    }
+    } */
 
     return NextResponse.next();
   },
