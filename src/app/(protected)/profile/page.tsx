@@ -4,6 +4,7 @@ import { api } from '@/lib/api';
 import ProfileForm from './components/ProfileForm';
 
 const page = async () => {
+  return null;
   try {
 
     const response = await api.get<UserResponse>(`/api/auth/profile`);
