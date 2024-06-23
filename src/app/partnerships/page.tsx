@@ -7,6 +7,7 @@ import { Microscope } from "lucide-react"
 import SectionTitle from "@/components/SectionTitle";
 import Navigation from "../navigation";
 import Footer from "../footer";
+import Link from 'next/link';
 
 export default function page() {
   return (
@@ -56,12 +57,13 @@ export default function page() {
                   up-to-date information, and to report initial farm conditions.
                 </p>
                 <div className="mt-10">
-                  <button
-                    type="submit"
-                    className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300"
-                  >
-                    Explore
-                  </button>
+                  <Link href="/services" passHref>
+                    <button
+                      className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition duration-300"
+                    >
+                      Explore
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

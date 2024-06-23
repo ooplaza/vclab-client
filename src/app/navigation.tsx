@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect, FC } from "react";
 import Image from "next/image";
 import Logo from '@public/img/logo-v2.png';
@@ -7,13 +7,15 @@ import { usePathname } from 'next/navigation';
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { getSession } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
 import { Session } from 'next-auth';
 
 const Navigation: FC = () => {
     const pathname = usePathname();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
 
     useEffect(() => {
         const fetchSession = async () => {
@@ -37,6 +39,10 @@ const Navigation: FC = () => {
 
     const toggleDrawer = () => {
         setIsDrawerOpen(!isDrawerOpen);
+    };
+
+    const handleLogout = async () => {
+        await signOut({ callbackUrl: '/login' });
     };
 
     return (
@@ -110,21 +116,61 @@ const Navigation: FC = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <Link href={session ? '/dashboard' : '/login'} passHref>
-                                            <Button className='rounded-lg text-white w-full mt-5'>
-                                                {session ? 'Dashboard' : 'Login'}
-                                            </Button>
-                                        </Link>
+                                        {session ? (
+                                            <div className='relative'>
+                                                <Button className='rounded-lg text-white w-full mt-5' onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}>
+                                                    Dashboard
+                                                </Button>
+                                                {isMobileDropdownOpen && (
+                                                    <div className='absolute right-0 mt-2 w-full bg-white rounded-md shadow-lg z-20'>
+                                                        <Link href='/dashboard' passHref>
+                                                            <span className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                                                                Dashboard
+                                                            </span>
+                                                        </Link>
+                                                        <button onClick={handleLogout} className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                                                            Logout
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <Link href='/login' passHref>
+                                                <Button className='rounded-lg text-white w-full mt-5'>
+                                                    Login
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </SheetDescription>
                                 </SheetContent>
                             </Sheet>
                         </div>
 
-                        <Link href={session ? '/dashboard' : '/login'} passHref>
-                            <Button className='rounded-lg text-white hidden md:block'>
-                                {session ? 'Dashboard' : 'Login'}
-                            </Button>
-                        </Link>
+                        {session ? (
+                            <div className='relative'>
+                                <Button className='rounded-lg text-white hidden md:block' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+                                    Dashboard
+                                </Button>
+                                {isDropdownOpen && (
+                                    <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20'>
+                                        <Link href='/dashboard' passHref>
+                                            <span className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                                                Dashboard
+                                            </span>
+                                        </Link>
+                                        <button onClick={handleLogout} className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Link href='/login' passHref>
+                                <Button className='rounded-lg text-white hidden md:block'>
+                                    Login
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

@@ -11,6 +11,8 @@ const Layout: FC<{
     switch (session?.user.role) {
       case 'admin':
         return admin;
+      case 'user':
+        return admin;
       default:
         return null;
     }
