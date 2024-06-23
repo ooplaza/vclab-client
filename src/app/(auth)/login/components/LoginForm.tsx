@@ -63,6 +63,8 @@ const LoginForm: FC = () => {
         description: response.error,
         variant: 'destructive',
       });
+
+      form.setValue('password', '');
     } else {
       router.push('/dashboard');
     }
