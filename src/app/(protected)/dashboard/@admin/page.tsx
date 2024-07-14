@@ -1,9 +1,20 @@
+"use client"
 import { api } from '@/lib/api';
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
-const Page = async () => {
-  const { data } = await api.get('/api/auth/repositories');
+type Category = string | { name: string };
+
+interface ResultItem {
+  category: Category;
+}
+
+interface ApiResponse {
+  results: ResultItem[];
+}
+
+const page = async () => {
+  const { data } = await api.get<ApiResponse>('/api/auth/repositories');
 
   if (!data || !Array.isArray(data.results)) {
     return <div>No data available</div>;
@@ -12,7 +23,7 @@ const Page = async () => {
   const aggregateCategories = () => {
     const categoryMap = new Map<string, number>();
 
-    data.results.forEach((item: any) => {
+    data.results.forEach((item: ResultItem) => {
       let categoryName = '';
 
       if (typeof item.category === 'string') {
@@ -53,4 +64,4 @@ const Page = async () => {
   );
 };
 
-export default Page;
+export default page;
