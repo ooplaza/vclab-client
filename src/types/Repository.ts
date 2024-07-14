@@ -9,7 +9,8 @@ export interface Repository {
 }
 
 export interface Category {
-  name: string;
+  name: string; 
+  count?: number;
 }
 
 
@@ -18,3 +19,4 @@ export interface RepositoryPaginatedData {
   count: number;
   last_page: number;
 }
+ 
