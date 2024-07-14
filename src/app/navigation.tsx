@@ -119,7 +119,7 @@ const Navigation: FC = () => {
                                         {session ? (
                                             <div className='relative'>
                                                 <Button className='rounded-lg text-white w-full mt-5' onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}>
-                                                    Dashboard
+                                                    {session.user?.name?.split(' ')[0] ?? 'User'}
                                                 </Button>
                                                 {isMobileDropdownOpen && (
                                                     <div className='absolute right-0 mt-2 w-full bg-white rounded-md shadow-lg z-20'>
@@ -149,7 +149,7 @@ const Navigation: FC = () => {
                         {session ? (
                             <div className='relative'>
                                 <Button className='rounded-lg text-white hidden md:block' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                                    Dashboard
+                                    {session.user?.name?.split(' ')[0] ?? 'User'}
                                 </Button>
                                 {isDropdownOpen && (
                                     <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20'>
