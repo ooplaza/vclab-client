@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Home,
-  User,
-  Users,
-  FolderKanban
-} from 'lucide-react';
+import { Home, User, Users, FolderKanban } from 'lucide-react';
 
 interface Route {
   route: string;
@@ -14,6 +9,7 @@ interface Route {
   isSidebarVisible: boolean;
   child_routes: Route[] | [];
 }
+
 const routes: Route[] = [
   {
     route: '/dashboard',
@@ -31,12 +27,11 @@ const routes: Route[] = [
     isSidebarVisible: true,
     child_routes: [],
   },
-
   {
     route: '/users-list',
     title: 'Users List',
     icon: <Users />,
-    roles: ['admin',],
+    roles: ['admin'],
     isSidebarVisible: true,
     child_routes: [],
   },
@@ -44,7 +39,7 @@ const routes: Route[] = [
     route: '/profile',
     title: 'Profile',
     icon: <User />,
-    roles: ['admin', 'user',],
+    roles: ['admin', 'user'],
     isSidebarVisible: true,
     child_routes: [],
   },
